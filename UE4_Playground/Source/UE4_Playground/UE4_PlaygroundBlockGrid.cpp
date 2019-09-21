@@ -37,7 +37,7 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 	Super::BeginPlay();	
 
 	// Set the blocks
-	BlocksBitboard = SetTileState(BlocksBitboard, 0, 0);
+	//BlocksBitboard = SetTileState(BlocksBitboard, 0, 0);
 	//BlocksBitboard = SetTileState(BlocksBitboard, 0, 2);
 	//BlocksBitboard = SetTileState(BlocksBitboard, 1, 0);
 	//BlocksBitboard = SetTileState(BlocksBitboard, 1, 0);
