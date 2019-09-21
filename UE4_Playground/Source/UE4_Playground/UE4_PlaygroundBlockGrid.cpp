@@ -29,6 +29,7 @@ AUE4_PlaygroundBlockGrid::AUE4_PlaygroundBlockGrid()
 
 	GridBitboard = 0;
 	BlocksBitboard = 0;
+
 }
 
 
@@ -37,12 +38,47 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 	Super::BeginPlay();	
 
 	// Set the blocks
-	//BlocksBitboard = SetTileState(BlocksBitboard, 0, 0);
-	//BlocksBitboard = SetTileState(BlocksBitboard, 0, 2);
-	//BlocksBitboard = SetTileState(BlocksBitboard, 1, 0);
-	//BlocksBitboard = SetTileState(BlocksBitboard, 1, 0);
-	//BlocksBitboard = SetTileState(BlocksBitboard, 2, 0);
-	//BlocksBitboard = SetTileState(BlocksBitboard, 2, 3);
+	
+	BlocksBitboard = SetTileState(BlocksBitboard, 0, 0);
+	BlocksBitboard = SetTileState(BlocksBitboard, 0, 2);
+	BlocksBitboard = SetTileState(BlocksBitboard, 0, 4);
+	BlocksBitboard = SetTileState(BlocksBitboard, 0, 5);
+	BlocksBitboard = SetTileState(BlocksBitboard, 0, 6);
+	BlocksBitboard = SetTileState(BlocksBitboard, 0, 7);
+
+	BlocksBitboard = SetTileState(BlocksBitboard, 1, 0);
+	BlocksBitboard = SetTileState(BlocksBitboard, 1, 5);
+	BlocksBitboard = SetTileState(BlocksBitboard, 1, 7);
+
+
+	BlocksBitboard = SetTileState(BlocksBitboard, 2, 3);
+	BlocksBitboard = SetTileState(BlocksBitboard, 2, 7);
+
+	BlocksBitboard = SetTileState(BlocksBitboard, 3, 0);
+	BlocksBitboard = SetTileState(BlocksBitboard, 3, 4);
+	BlocksBitboard = SetTileState(BlocksBitboard, 3, 7);
+
+	BlocksBitboard = SetTileState(BlocksBitboard, 4, 0);
+
+	BlocksBitboard = SetTileState(BlocksBitboard, 5, 5);
+	BlocksBitboard = SetTileState(BlocksBitboard, 5, 6);
+
+	BlocksBitboard = SetTileState(BlocksBitboard, 6, 1);
+	BlocksBitboard = SetTileState(BlocksBitboard, 6, 4);
+	BlocksBitboard = SetTileState(BlocksBitboard, 6, 5);
+
+	BlocksBitboard = SetTileState(BlocksBitboard, 7, 0);
+	BlocksBitboard = SetTileState(BlocksBitboard, 7, 3);
+	BlocksBitboard = SetTileState(BlocksBitboard, 7, 5);
+	BlocksBitboard = SetTileState(BlocksBitboard, 7, 6);
+	BlocksBitboard = SetTileState(BlocksBitboard, 7, 7);
+
+	UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundBlockGrid::BlocksBitboard %lu"), BlocksBitboard);
+
+	GridBitboard = 0x0000000000000000000000000000000000000000000000000000000000000000;
+
+	UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundBlockGrid::GridBitboard %lu"), GridBitboard);
+
 
 	if (BlockClass == nullptr) return;
 
@@ -50,13 +86,13 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 	float XOffset = 0.0f;
 	float YOffset = 0.0f;
 
-	for (int32 col = 0; col < Width; col++)
+	for (int32 col = 0; col < Width; col++)	
 	{
 		for (int32 row = 0; row < Height; row++)
 		{		
 			XOffset = col * BlockSpacing;
 			YOffset = row * BlockSpacing;
-			const FVector BlockLocation = FVector(XOffset, YOffset, 0.0f) + GetActorLocation();
+			const FVector BlockLocation = FVector(YOffset, XOffset, 0.0f) + GetActorLocation();
 
 			AUE4_PlaygroundBlock* NewBlock = GetWorld()->SpawnActor<AUE4_PlaygroundBlock>(BlockClass, BlockLocation, FRotator(0, 0, 0));			
 
@@ -76,6 +112,10 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 					UE_LOG(LogTemp, Warning, TEXT("GetTileState it's a block %d , %d"), row, col);
 
 					NewBlock->SetBlockType(0);
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("GetTileState it's NOT block %d , %d"), row, col);
 				}
 			}
 
@@ -130,10 +170,12 @@ void AUE4_PlaygroundBlockGrid::AddScore()
 
 ///// BIT BOARD ///////
 // Sets the a cell state in the bitboard
-long AUE4_PlaygroundBlockGrid::SetTileState(const long& bitBoard, const int32& row, const int32& column)
+int64_t AUE4_PlaygroundBlockGrid::SetTileState(const int64_t& bitBoard, const int32& row, const int32& column)
 {
+	UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundBlockGrid::SetTileState %l - ( %d , %d )"), bitBoard, row, column);
+
 	// Set the bit in the correct position for the bitboard
-	long newBit = 1L << (row * Width + column);
+	int64_t newBit = 1LL << (row * Width + column);
 
 	newBit |= bitBoard;
 
@@ -141,9 +183,12 @@ long AUE4_PlaygroundBlockGrid::SetTileState(const long& bitBoard, const int32& r
 }
 
 // Returns the state of a specific row and column in a bitboard
-bool AUE4_PlaygroundBlockGrid::GetTileState(const long& bitBoard, const int32& row, const int32& column) const
+bool AUE4_PlaygroundBlockGrid::GetTileState(const int64_t& bitBoard, const int32& row, const int32& column) const
 {
-	long mask = 1L << (row * Width + column);
+	//UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundBlockGrid::GetTileState %ld - ( %d , %d )"), bitBoard, row, column);
+
+	//long mask = 1uLL << (row * Width + column);
+	int64_t mask = 1LL << (row * Width + column);
 
 	return ((mask & bitBoard) != 0);
 }

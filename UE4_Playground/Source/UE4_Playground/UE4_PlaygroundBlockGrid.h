@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include <bitset>
 #include "UE4_PlaygroundBlockGrid.generated.h"
 
 /** Class used to spawn blocks and manage score */
@@ -76,14 +77,15 @@ private:
 	///// BIT BOARD ///////
 
 	// Grid Representation, long is 64 bits
-	long GridBitboard;
+	int64_t GridBitboard;
 
 	// Bit board represeting the blocks
-	long BlocksBitboard;
+	int64_t BlocksBitboard; //long long int
 
-	long SetTileState(const long& bitBoard, const int32& row, const int32& column);
 
-	bool GetTileState(const long& bitBoard, const int32& row, const int32& column)  const;
+	int64_t SetTileState(const int64_t& bitBoard, const int32& row, const int32& column);
+
+	bool GetTileState(const int64_t& bitBoard, const int32& row, const int32& column)  const;
 
 	///// BIT BOARD ///////
 
