@@ -15,6 +15,8 @@ public:
 	// Sets default values for this character's properties
 	AMainCharacter();
 
+	void MoveToPosition(FVector position);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -58,8 +58,8 @@ AUE4_PlaygroundBlock::AUE4_PlaygroundBlock()
 	MaterialBlock = ConstructorStatics.MBlock.Get();
 	MaterialStraight = ConstructorStatics.MStraight.Get();
 
-	BlockMesh->SetMaterial(0, BaseMaterial);
-
+	//BlockMesh->SetMaterial(0, BaseMaterial);
+	BlockType = 1;
 	bActive = false;
 
 }
@@ -78,36 +78,48 @@ void AUE4_PlaygroundBlock::OnFingerPressedBlock(ETouchIndex::Type FingerIndex, U
 void AUE4_PlaygroundBlock::HandleClicked()
 {
 	// Check we are not already active
-	if (!bActive)
+	//if (!bActive)
+	//{
+		//bActive = true;
+	//}
+
+	// Prevent to click on blocked
+	if (BlockType == 0) return;
+
+	OwningGrid->SetBlockClicked(this);
+
+	SetBlockType(BlockType);	
+
+	BlockType++;
+
+	if (BlockType > 3)
 	{
-		bActive = true;
-
-		OwningGrid->SetBlockClicked(this);
-	}
-
-	SetBlockType(ClicksCount);
-
-	ClicksCount++;
-
-	if (ClicksCount > 3)
-	{
-		ClicksCount = 0;
+		BlockType = 1; // Don't add block 0
 	}
 
 }
 
-void AUE4_PlaygroundBlock::SetBlockType(int32 Type)
+/*void AUE4_PlaygroundBlock::InitializeBlock(int32 row, int32 col)
 {
-	switch (Type)
+	RowInGrid = row;
+
+	ColInGrid = col;
+}*/
+
+void AUE4_PlaygroundBlock::SetBlockType(int32 type)
+{
+	BlockType = type;
+
+	switch (BlockType)
 	{
 	case 0:
 		BlockMesh->SetMaterial(0, MaterialBlock);
 		break;
 	case 1:
+
 		BlockMesh->SetMaterial(0, MaterialTurnRight);
 		break;
 	case 2:
-		
 		BlockMesh->SetMaterial(0, MaterialTurnLeft);
 		break;
 	case 3:

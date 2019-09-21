@@ -27,7 +27,7 @@ AUE4_PlaygroundBlockGrid::AUE4_PlaygroundBlockGrid()
 	Height = 8;
 	NumberBlocksClicked = 0;
 
-	GridBitboard = 0;
+
 	BlocksBitboard = 0;
 
 }
@@ -73,14 +73,17 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 	BlocksBitboard = SetTileState(BlocksBitboard, 7, 6);
 	BlocksBitboard = SetTileState(BlocksBitboard, 7, 7);
 
-	UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundBlockGrid::BlocksBitboard %lu"), BlocksBitboard);
+	//UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundBlockGrid::BlocksBitboard %lu"), BlocksBitboard);
 
-	GridBitboard = 0x0000000000000000000000000000000000000000000000000000000000000000;
+	//GridBitboard = 0x0000000000000000000000000000000000000000000000000000000000000000;
 
-	UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundBlockGrid::GridBitboard %lu"), GridBitboard);
+	//UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundBlockGrid::GridBitboard %lu"), GridBitboard);
 
 
 	if (BlockClass == nullptr) return;
+
+	CurrentRowMainChar = 0;
+	CurrentColMainChar = 1;
 
 
 	float XOffset = 0.0f;
@@ -105,6 +108,8 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 				FString cellName = "Cell " + FString::FromInt(id) + " (" + FString::FromInt(row) + "," + FString::FromInt(col) + ")";
 
 				NewBlock->SetActorLabel(cellName);
+				NewBlock->SetRow(row);
+				NewBlock->SetCol(col);
 
 				// Check if it's a block
 				if (GetTileState(BlocksBitboard, row, col))
@@ -113,47 +118,83 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 
 					NewBlock->SetBlockType(0);
 				}
-				else
-				{
-					UE_LOG(LogTemp, Warning, TEXT("GetTileState it's NOT block %d , %d"), row, col);
-				}
 			}
 
-			if ((row == 0) && (col == 1))
+			// Spawn main character
+			if ((row == CurrentRowMainChar) && (col == CurrentColMainChar))
 			{
 				if (MainCharacterClass != nullptr)
-				{
-					
-					const FVector MainPlayerPosition = FVector(XOffset, YOffset, 178.0f) + GetActorLocation();
+				{					
+					const FVector MainPlayerPosition = FVector(YOffset, XOffset, 178.0f) + GetActorLocation();
 
 					MainCharacter = GetWorld()->SpawnActor<AMainCharacter>(MainCharacterClass, MainPlayerPosition, FRotator(0, 0, 0));
 				}
 			}
-
-			
 		}
 	}
-
-
-
 }
 
 
 void AUE4_PlaygroundBlockGrid::SetBlockClicked(class AUE4_PlaygroundBlock* Block)
 {
-	if (LastBlockClicked != Block)
-	{
-		NumberBlocksClicked++;
-	}
 
-	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::SetBlockClicked] NumberBlocksClicked: %d"), NumberBlocksClicked);
+	if (!Block->IsActive())
+	{
+		Block->SetActive(true);
+
+		NumberBlocksClicked++;
+	}	
+
+	LastBlockClicked = Block;
+
+	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::SetBlockClicked] %s: Type %d - (%d, %d) ->  NumberBlocksClicked: %d"), *Block->GetActorLabel(), Block->GetType(), Block->GetRow(), Block->GetCol(), NumberBlocksClicked);
 
 	if (NumberBlocksClicked >= MaximunBlockClicks)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::SetBlockClicked] Reached max clicks"));
+		//UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::SetBlockClicked] Reached max clicks"));
 	}
 
-	LastBlockClicked = Block;
+	// Check billboard
+	
+	// Check tiles 
+	// Check on that position there was a tile
+	if (GetTileState(TurnRightBlocksBitboard, Block->GetRow(), Block->GetCol()))
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::SetBlockClicked] %s (%d ,%d) = TurnRightBlocksBitboard"), *Block->GetActorLabel(), Block->GetRow(), Block->GetCol());
+		
+		// Removed state
+		TurnRightBlocksBitboard = RemoveTileState(TurnRightBlocksBitboard, Block->GetRow(), Block->GetCol());
+	}
+
+	if (GetTileState(TurnLeftBlocksBitboard, Block->GetRow(), Block->GetCol()))
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::SetBlockClicked] %s (%d ,%d) = TurnLeftBlocksBitboard"), *Block->GetActorLabel(), Block->GetRow(), Block->GetCol());
+		TurnLeftBlocksBitboard = RemoveTileState(TurnLeftBlocksBitboard, Block->GetRow(), Block->GetCol());
+	}
+
+
+	if (GetTileState(StraightBlocksBitboard, Block->GetRow(), Block->GetCol()))
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::SetBlockClicked] %s (%d ,%d) = StraightBlocksBitboard"), *Block->GetActorLabel(), Block->GetRow(), Block->GetCol());
+		StraightBlocksBitboard = RemoveTileState(StraightBlocksBitboard, Block->GetRow(), Block->GetCol());
+	}
+
+
+
+	switch (Block->GetType())
+	{
+	case 1:
+		
+		// Set TurnRight for this cell
+		TurnRightBlocksBitboard = SetTileState(TurnRightBlocksBitboard, Block->GetRow(), Block->GetCol());
+		break;
+	case 2:
+		TurnLeftBlocksBitboard = SetTileState(TurnLeftBlocksBitboard, Block->GetRow(), Block->GetCol());
+		break;
+	case 3:
+		StraightBlocksBitboard = SetTileState(StraightBlocksBitboard, Block->GetRow(), Block->GetCol());
+		break;
+	}
 }
 
 void AUE4_PlaygroundBlockGrid::AddScore()
@@ -165,6 +206,25 @@ void AUE4_PlaygroundBlockGrid::AddScore()
 	ScoreText->SetText(FText::Format(LOCTEXT("ScoreFmt", "Score: {0}"), FText::AsNumber(Score)));
 }
 
+void AUE4_PlaygroundBlockGrid::StartAction()
+{
+	if (MainCharacter == nullptr) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction]"));
+
+	// Move to next direction
+
+	CurrentRowMainChar++;
+
+	float xPostion = CurrentColMainChar * BlockSpacing;
+	float yPostion = CurrentRowMainChar * BlockSpacing;
+
+	const FVector MainPlayerPosition = FVector(yPostion, xPostion, 178.0f) + GetActorLocation();
+
+	MainCharacter = GetWorld()->SpawnActor<AMainCharacter>(MainCharacterClass, MainPlayerPosition, FRotator(0, 0, 0));
+
+}
+
 #undef LOCTEXT_NAMESPACE
 
 
@@ -172,10 +232,20 @@ void AUE4_PlaygroundBlockGrid::AddScore()
 // Sets the a cell state in the bitboard
 int64_t AUE4_PlaygroundBlockGrid::SetTileState(const int64_t& bitBoard, const int32& row, const int32& column)
 {
-	UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundBlockGrid::SetTileState %l - ( %d , %d )"), bitBoard, row, column);
+	//UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundBlockGrid::SetTileState %l - ( %d , %d )"), bitBoard, row, column);
 
 	// Set the bit in the correct position for the bitboard
 	int64_t newBit = 1LL << (row * Width + column);
+
+	newBit |= bitBoard;
+
+	return (newBit);
+}
+
+int64_t AUE4_PlaygroundBlockGrid::RemoveTileState(const int64_t& bitBoard, const int32& row, const int32& column)
+{
+	// Set the bit in the correct position for the bitboard
+	int64_t newBit = 1LL >> (row * Width + column);
 
 	newBit |= bitBoard;
 

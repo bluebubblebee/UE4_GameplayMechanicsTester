@@ -43,8 +43,16 @@ void AUE4_PlaygroundPawn::SetupPlayerInputComponent(UInputComponent* PlayerInput
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	//PlayerInputComponent->BindAction("OnResetVR", EInputEvent::IE_Pressed, this, &AUE4_PlaygroundPawn::OnResetVR);
 	PlayerInputComponent->BindAction("TriggerClick", EInputEvent::IE_Pressed, this, &AUE4_PlaygroundPawn::TriggerClick);
+
+	PlayerInputComponent->BindAction("Action", EInputEvent::IE_Pressed, this, &AUE4_PlaygroundPawn::StartAction);
+
+	
+}
+
+void AUE4_PlaygroundPawn::StartAction()
+{
+
 }
 
 void AUE4_PlaygroundPawn::CalcCamera(float DeltaTime, struct FMinimalViewInfo& OutResult)
@@ -54,12 +62,7 @@ void AUE4_PlaygroundPawn::CalcCamera(float DeltaTime, struct FMinimalViewInfo& O
 	OutResult.Rotation = FRotator(-90.0f, -90.0f, 0.0f);
 }
 
-/*
-void AUE4_PlaygroundPawn::OnResetVR()
-{
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
-}
-*/
+
 
 void AUE4_PlaygroundPawn::TriggerClick()
 {

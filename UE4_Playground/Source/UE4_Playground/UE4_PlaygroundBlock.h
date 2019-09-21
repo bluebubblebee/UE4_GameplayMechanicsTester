@@ -67,13 +67,35 @@ public:
 	/** Returns BlockMesh subobject **/
 	FORCEINLINE class UStaticMeshComponent* GetBlockMesh() const { return BlockMesh; }
 
-	void SetBlockType(int32 Type);
+	FORCEINLINE bool IsActive() const { return bActive; }
+
+	FORCEINLINE void SetActive(bool active)  { bActive = active; }
+
+	FORCEINLINE int32 GetType() const { return BlockType; }
+
+	FORCEINLINE int32 GetRow() const { return RowInGrid; }
+
+	FORCEINLINE void SetRow(int32 row) { RowInGrid = row; }
+
+	FORCEINLINE int32 GetCol() const { return ColInGrid; }
+
+	FORCEINLINE void SetCol(int32 col) { ColInGrid = col; }
+
+	//void InitializeBlock(int32 row, int32 col);
+
+	void SetBlockType(int32 type);
 
 private:
 
-	int32 ClicksCount;
-
 	bool bActive;
+
+	int32 BlockType;
+
+	int32 RowInGrid;
+
+	int32 ColInGrid;
+
+	
 };
 
 

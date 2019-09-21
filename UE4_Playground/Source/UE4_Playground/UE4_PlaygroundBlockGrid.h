@@ -56,6 +56,8 @@ public:
 	/** Handle the block being clicked */
 	void AddScore();
 
+	void StartAction();
+
 	void SetBlockClicked(class AUE4_PlaygroundBlock* Block);
 
 	FORCEINLINE class USceneComponent* GetDummyRoot() const { return DummyRoot; }
@@ -71,23 +73,43 @@ private:
 
 	class AUE4_PlaygroundBlock* LastBlockClicked = nullptr;
 
+	///// MAIN CHARACTER ///////
+
 	class AMainCharacter* MainCharacter;
+
+	int32 CurrentRowMainChar;
+
+	int32 CurrentColMainChar;
+
+	///// MAIN CHARACTER ///////
 
 private:
 	///// BIT BOARD ///////
 
 	// Grid Representation, long is 64 bits
-	int64_t GridBitboard;
 
-	// Bit board represeting the blocks
-	int64_t BlocksBitboard; //long long int
+	// long long int, 64 bits. Bit board represeting the blocks
+	int64_t BlocksBitboard; 
 
+	// long long int, 64 bits. Bit board represeting Straight in the grid
+	int64_t StraightBlocksBitboard; 
 
+	// long long int, 64 bits. Bit board represeting Straight in the grid
+	int64_t TurnLeftBlocksBitboard;
+
+	// long long int, 64 bits. Bit board represeting Straight in the grid
+	int64_t TurnRightBlocksBitboard;
+
+	
 	int64_t SetTileState(const int64_t& bitBoard, const int32& row, const int32& column);
+
+	int64_t RemoveTileState(const int64_t& bitBoard, const int32& row, const int32& column);
 
 	bool GetTileState(const int64_t& bitBoard, const int32& row, const int32& column)  const;
 
 	///// BIT BOARD ///////
+
+
 
 };
 

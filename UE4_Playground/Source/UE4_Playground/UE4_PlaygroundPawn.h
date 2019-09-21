@@ -23,6 +23,8 @@ protected:
 	void TriggerClick();
 	void TraceForBlock(const FVector& Start, const FVector& End, bool bDrawDebugHelpers);	
 
+	void StartAction();
+
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
 	class AUE4_PlaygroundBlock* CurrentBlockFocus;	
 };

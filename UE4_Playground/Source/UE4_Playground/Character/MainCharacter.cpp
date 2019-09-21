@@ -25,6 +25,11 @@ void AMainCharacter::Tick(float DeltaTime)
 
 }
 
+void AMainCharacter::MoveToPosition(FVector position)
+{
+
+}
+
 // Called to bind functionality to input
 void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
