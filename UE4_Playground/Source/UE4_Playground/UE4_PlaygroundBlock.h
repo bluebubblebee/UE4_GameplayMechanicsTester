@@ -67,6 +67,8 @@ public:
 	/** Returns BlockMesh subobject **/
 	FORCEINLINE class UStaticMeshComponent* GetBlockMesh() const { return BlockMesh; }
 
+	void SetBlockType(int32 Type);
+
 private:
 
 	int32 ClicksCount;

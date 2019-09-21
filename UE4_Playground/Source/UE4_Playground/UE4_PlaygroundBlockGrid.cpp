@@ -4,6 +4,7 @@
 #include "UE4_PlaygroundBlock.h"
 #include "Components/TextRenderComponent.h"
 #include "Engine/World.h"
+#include "Character/MainCharacter.h"
 
 #define LOCTEXT_NAMESPACE "PuzzleBlockGrid"
 
@@ -22,42 +23,85 @@ AUE4_PlaygroundBlockGrid::AUE4_PlaygroundBlockGrid()
 
 	MaximunBlockClicks = 10;
 	BlockSpacing = 265.0f;
-	Size = 8;
+	Width = 8;
+	Height = 8;
 	NumberBlocksClicked = 0;
 
+	GridBitboard = 0;
+	BlocksBitboard = 0;
 }
 
 
 void AUE4_PlaygroundBlockGrid::BeginPlay()
 {
-	Super::BeginPlay();
+	Super::BeginPlay();	
+
+	// Set the blocks
+	BlocksBitboard = SetTileState(BlocksBitboard, 0, 0);
+	//BlocksBitboard = SetTileState(BlocksBitboard, 0, 2);
+	//BlocksBitboard = SetTileState(BlocksBitboard, 1, 0);
+	//BlocksBitboard = SetTileState(BlocksBitboard, 1, 0);
+	//BlocksBitboard = SetTileState(BlocksBitboard, 2, 0);
+	//BlocksBitboard = SetTileState(BlocksBitboard, 2, 3);
 
 	if (BlockClass == nullptr) return;
 
-	const int32 NumBlocks = Size * Size;
 
-	for(int32 BlockIndex=0; BlockIndex < NumBlocks; BlockIndex++)
+	float XOffset = 0.0f;
+	float YOffset = 0.0f;
+
+	for (int32 col = 0; col < Width; col++)
 	{
-		const float XOffset = (BlockIndex/Size) * BlockSpacing; // Divide by dimension
-		const float YOffset = (BlockIndex%Size) * BlockSpacing; // Modulo gives remainder
+		for (int32 row = 0; row < Height; row++)
+		{		
+			XOffset = col * BlockSpacing;
+			YOffset = row * BlockSpacing;
+			const FVector BlockLocation = FVector(XOffset, YOffset, 0.0f) + GetActorLocation();
 
-		// Make position vector, offset from Grid location
-		const FVector BlockLocation = FVector(XOffset, YOffset, 0.f) + GetActorLocation();
+			AUE4_PlaygroundBlock* NewBlock = GetWorld()->SpawnActor<AUE4_PlaygroundBlock>(BlockClass, BlockLocation, FRotator(0, 0, 0));			
 
-		AUE4_PlaygroundBlock* NewBlock = GetWorld()->SpawnActor<AUE4_PlaygroundBlock>(BlockClass, BlockLocation, FRotator(0, 0, 0));	
+			// Tell the block about its owner
+			if (NewBlock != nullptr)
+			{
+				NewBlock->OwningGrid = this;
 
-		// Tell the block about its owner
-		if (NewBlock != nullptr)
-		{
-			NewBlock->OwningGrid = this;
+				int32 id = (row * Width + col);;
+				FString cellName = "Cell " + FString::FromInt(id) + " (" + FString::FromInt(row) + "," + FString::FromInt(col) + ")";
+
+				NewBlock->SetActorLabel(cellName);
+
+				// Check if it's a block
+				if (GetTileState(BlocksBitboard, row, col))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("GetTileState it's a block %d , %d"), row, col);
+
+					NewBlock->SetBlockType(0);
+				}
+			}
+
+			if ((row == 0) && (col == 1))
+			{
+				if (MainCharacterClass != nullptr)
+				{
+					
+					const FVector MainPlayerPosition = FVector(XOffset, YOffset, 178.0f) + GetActorLocation();
+
+					MainCharacter = GetWorld()->SpawnActor<AMainCharacter>(MainCharacterClass, MainPlayerPosition, FRotator(0, 0, 0));
+				}
+			}
+
+			
 		}
 	}
+
+
+
 }
 
 
 void AUE4_PlaygroundBlockGrid::SetBlockClicked(class AUE4_PlaygroundBlock* Block)
 {
-	if (lastBlockClicked != Block)
+	if (LastBlockClicked != Block)
 	{
 		NumberBlocksClicked++;
 	}
@@ -69,7 +113,7 @@ void AUE4_PlaygroundBlockGrid::SetBlockClicked(class AUE4_PlaygroundBlock* Block
 		UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::SetBlockClicked] Reached max clicks"));
 	}
 
-	lastBlockClicked = Block;
+	LastBlockClicked = Block;
 }
 
 void AUE4_PlaygroundBlockGrid::AddScore()
@@ -82,3 +126,30 @@ void AUE4_PlaygroundBlockGrid::AddScore()
 }
 
 #undef LOCTEXT_NAMESPACE
+
+
+///// BIT BOARD ///////
+// Sets the a cell state in the bitboard
+long AUE4_PlaygroundBlockGrid::SetTileState(const long& bitBoard, const int32& row, const int32& column)
+{
+	// Set the bit in the correct position for the bitboard
+	long newBit = 1L << (row * Width + column);
+
+	newBit |= bitBoard;
+
+	return (newBit);
+}
+
+// Returns the state of a specific row and column in a bitboard
+bool AUE4_PlaygroundBlockGrid::GetTileState(const long& bitBoard, const int32& row, const int32& column) const
+{
+	long mask = 1L << (row * Width + column);
+
+	return ((mask & bitBoard) != 0);
+}
+
+///// BIT BOARD ///////
+
+
+
+

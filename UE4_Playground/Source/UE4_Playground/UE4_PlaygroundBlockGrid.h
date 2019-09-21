@@ -21,19 +21,8 @@ class AUE4_PlaygroundBlockGrid : public AActor
 	class UTextRenderComponent* ScoreText;
 
 public:
+
 	AUE4_PlaygroundBlockGrid();
-
-
-	
-
-	/** Number of blocks along each side of grid */
-	//UPROPERTY(Category=Grid, EditAnywhere, BlueprintReadOnly)
-	//int32 Size;
-
-	/** Spacing of blocks */
-	//UPROPERTY(Category=Grid, EditAnywhere, BlueprintReadOnly)
-	//float BlockSpacing;
-
 
 protected:
 
@@ -46,12 +35,16 @@ protected:
     TSubclassOf<class AUE4_PlaygroundBlock> BlockClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Grid Settings")
+	TSubclassOf<class AMainCharacter> MainCharacterClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Grid Settings")
 	int MaximunBlockClicks;
 
-	/** Number of blocks along each side of grid */
-	UPROPERTY(EditDefaultsOnly, Category = "Grid Settings")
-	int32 Size;
+	UPROPERTY(BlueprintReadOnly, Category = "Grid Settings")
+	int32 Width;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Grid Settings")
+	int32 Height;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Grid Settings")
 	float BlockSpacing;
@@ -75,9 +68,24 @@ private:
 
 	int32 NumberBlocksClicked;
 
-	class AUE4_PlaygroundBlock* lastBlockClicked = nullptr;
+	class AUE4_PlaygroundBlock* LastBlockClicked = nullptr;
 
+	class AMainCharacter* MainCharacter;
 
+private:
+	///// BIT BOARD ///////
+
+	// Grid Representation, long is 64 bits
+	long GridBitboard;
+
+	// Bit board represeting the blocks
+	long BlocksBitboard;
+
+	long SetTileState(const long& bitBoard, const int32& row, const int32& column);
+
+	bool GetTileState(const long& bitBoard, const int32& row, const int32& column)  const;
+
+	///// BIT BOARD ///////
 
 };
 

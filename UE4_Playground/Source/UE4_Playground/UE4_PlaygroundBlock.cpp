@@ -85,28 +85,35 @@ void AUE4_PlaygroundBlock::HandleClicked()
 		OwningGrid->SetBlockClicked(this);
 	}
 
-	switch (ClicksCount)
-	{
-	case 0:
-		BlockMesh->SetMaterial(0, MaterialTurnLeft);
-		break;
-	case 1:
-		BlockMesh->SetMaterial(0, MaterialTurnRight);
-		break;
-	case 2:
-		BlockMesh->SetMaterial(0, MaterialBlock);
-		break;
-	case 3:
-		BlockMesh->SetMaterial(0, MaterialStraight);
-		break;
-	}
+	SetBlockType(ClicksCount);
 
 	ClicksCount++;
+
 	if (ClicksCount > 3)
 	{
 		ClicksCount = 0;
 	}
 
+}
+
+void AUE4_PlaygroundBlock::SetBlockType(int32 Type)
+{
+	switch (Type)
+	{
+	case 0:
+		BlockMesh->SetMaterial(0, MaterialBlock);
+		break;
+	case 1:
+		BlockMesh->SetMaterial(0, MaterialTurnRight);
+		break;
+	case 2:
+		
+		BlockMesh->SetMaterial(0, MaterialTurnLeft);
+		break;
+	case 3:
+		BlockMesh->SetMaterial(0, MaterialStraight);
+		break;
+	}
 }
 
 void AUE4_PlaygroundBlock::Highlight(bool bOn)
