@@ -18,7 +18,7 @@ AUE4_PlaygroundBlock::AUE4_PlaygroundBlock()
 		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MTurnLeft;
 		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MTurnRight;
 		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MStraight;
-		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MBlock;
+		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MBlock;  
 
 		FConstructorStatics()
 			: PlaneMesh(TEXT("/Game/Art/Tiles/Tile.Tile"))
@@ -59,7 +59,7 @@ AUE4_PlaygroundBlock::AUE4_PlaygroundBlock()
 	MaterialStraight = ConstructorStatics.MStraight.Get();
 
 	//BlockMesh->SetMaterial(0, BaseMaterial);
-	BlockType = 1;
+	CurrentClicks = (int)ETILETYPE::VE_TURN_RIGHT;
 	bActive = false;
 
 }
@@ -84,45 +84,39 @@ void AUE4_PlaygroundBlock::HandleClicked()
 	//}
 
 	// Prevent to click on blocked
-	if (BlockType == 0) return;
+	if (BlockType == ETILETYPE::VE_BLOCKED) return;
 
 	OwningGrid->SetBlockClicked(this);
 
-	SetBlockType(BlockType);	
+	SetBlockType((ETILETYPE)CurrentClicks);
 
-	BlockType++;
+	CurrentClicks++;
 
-	if (BlockType > 3)
+	if (CurrentClicks > ((int)ETILETYPE::VE_STRAIGHT))
 	{
-		BlockType = 1; // Don't add block 0
+		BlockType = ETILETYPE::VE_TURN_RIGHT; // Don't add block 0
 	}
 
 }
 
-/*void AUE4_PlaygroundBlock::InitializeBlock(int32 row, int32 col)
-{
-	RowInGrid = row;
 
-	ColInGrid = col;
-}*/
-
-void AUE4_PlaygroundBlock::SetBlockType(int32 type)
+void AUE4_PlaygroundBlock::SetBlockType(ETILETYPE type)
 {
 	BlockType = type;
 
 	switch (BlockType)
 	{
-	case 0:
+	case ETILETYPE::VE_BLOCKED:
 		BlockMesh->SetMaterial(0, MaterialBlock);
 		break;
-	case 1:
+	case ETILETYPE::VE_TURN_RIGHT:
 
 		BlockMesh->SetMaterial(0, MaterialTurnRight);
 		break;
-	case 2:
+	case ETILETYPE::VE_TURN_LEFT:
 		BlockMesh->SetMaterial(0, MaterialTurnLeft);
 		break;
-	case 3:
+	case ETILETYPE::VE_STRAIGHT:
 		BlockMesh->SetMaterial(0, MaterialStraight);
 		break;
 	}

@@ -8,6 +8,8 @@
 
 #define LOCTEXT_NAMESPACE "PuzzleBlockGrid"
 
+
+
 AUE4_PlaygroundBlockGrid::AUE4_PlaygroundBlockGrid()
 {
 	// Create dummy root scene component
@@ -116,7 +118,7 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 				{
 					UE_LOG(LogTemp, Warning, TEXT("GetTileState it's a block %d , %d"), row, col);
 
-					NewBlock->SetBlockType(0);
+					NewBlock->SetBlockType(ETILETYPE::VE_BLOCKED);
 				}
 			}
 
@@ -183,15 +185,15 @@ void AUE4_PlaygroundBlockGrid::SetBlockClicked(class AUE4_PlaygroundBlock* Block
 
 	switch (Block->GetType())
 	{
-	case 1:
+	case ETILETYPE::VE_TURN_RIGHT:
 		
 		// Set TurnRight for this cell
 		TurnRightBlocksBitboard = SetTileState(TurnRightBlocksBitboard, Block->GetRow(), Block->GetCol());
 		break;
-	case 2:
+	case ETILETYPE::VE_TURN_LEFT:
 		TurnLeftBlocksBitboard = SetTileState(TurnLeftBlocksBitboard, Block->GetRow(), Block->GetCol());
 		break;
-	case 3:
+	case ETILETYPE::VE_STRAIGHT:
 		StraightBlocksBitboard = SetTileState(StraightBlocksBitboard, Block->GetRow(), Block->GetCol());
 		break;
 	}
@@ -210,18 +212,34 @@ void AUE4_PlaygroundBlockGrid::StartAction()
 {
 	if (MainCharacter == nullptr) return;
 
-	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction]"));
+	//UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction]"));
 
 	// Move to next direction
 
-	CurrentRowMainChar++;
+	// Check next cell
+	
+	// If first time, character is looking forward
+	//CurrentRowMainChar++;
+
+
+	ETILETYPE type = GetTileType(CurrentColMainChar, CurrentRowMainChar +1);
+
+	//EUsesEnum UseEnumValue = EUsesEnum::UseEnum_Good;
+	//UE_LOG(LogSomething, Log, TEXT("UseEnumValue as string : %s"), *GETENUMSTRING("EUsesEnum", UseEnumValue));
+
+	FString typeName = GetEnumValueAsString<ETILETYPE>("ETILETYPE", type);	
+
+	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Next Tyle: %d %s "), type, *typeName);
+
 
 	float xPostion = CurrentColMainChar * BlockSpacing;
 	float yPostion = CurrentRowMainChar * BlockSpacing;
 
-	const FVector MainPlayerPosition = FVector(yPostion, xPostion, 178.0f) + GetActorLocation();
 
-	MainCharacter = GetWorld()->SpawnActor<AMainCharacter>(MainCharacterClass, MainPlayerPosition, FRotator(0, 0, 0));
+	const FVector MainPlayerPosition = FVector(yPostion, xPostion, 178.0f) + GetActorLocation();
+	//MainCharacter->SetActorLocation(MainPlayerPosition);
+
+
 
 }
 
@@ -261,6 +279,33 @@ bool AUE4_PlaygroundBlockGrid::GetTileState(const int64_t& bitBoard, const int32
 	int64_t mask = 1LL << (row * Width + column);
 
 	return ((mask & bitBoard) != 0);
+}
+
+
+ETILETYPE AUE4_PlaygroundBlockGrid::GetTileType(const int32 row, const int32 column)
+{
+	if (GetTileState(BlocksBitboard, row, column))
+	{
+		return ETILETYPE::VE_BLOCKED;
+	}
+
+	if (GetTileState(TurnRightBlocksBitboard, row, column))
+	{
+		return ETILETYPE::VE_TURN_RIGHT;
+	}
+
+	if (GetTileState(TurnLeftBlocksBitboard, row, column))
+	{
+		return ETILETYPE::VE_TURN_LEFT;
+	}
+
+
+	if (GetTileState(StraightBlocksBitboard, row, column))
+	{
+		return ETILETYPE::VE_STRAIGHT;
+	}
+
+	return ETILETYPE::VE_NONE;
 }
 
 ///// BIT BOARD ///////

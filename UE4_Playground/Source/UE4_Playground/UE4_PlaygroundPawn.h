@@ -20,6 +20,10 @@ public:
 	virtual void CalcCamera(float DeltaTime, struct FMinimalViewInfo& OutResult) override;
 
 protected:
+
+	virtual void BeginPlay() override;
+
+
 	void TriggerClick();
 	void TraceForBlock(const FVector& Start, const FVector& End, bool bDrawDebugHelpers);	
 
@@ -27,4 +31,6 @@ protected:
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
 	class AUE4_PlaygroundBlock* CurrentBlockFocus;	
+
+	class AUE4_PlaygroundBlockGrid* CurrentGrid;
 };

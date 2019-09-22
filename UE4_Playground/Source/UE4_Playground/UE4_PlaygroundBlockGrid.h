@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include <bitset>
+#include "Definitions.h"
+
 #include "UE4_PlaygroundBlockGrid.generated.h"
 
 /** Class used to spawn blocks and manage score */
@@ -106,6 +107,8 @@ private:
 	int64_t RemoveTileState(const int64_t& bitBoard, const int32& row, const int32& column);
 
 	bool GetTileState(const int64_t& bitBoard, const int32& row, const int32& column)  const;
+
+	ETILETYPE GetTileType(const int32 row, const int32 column);
 
 	///// BIT BOARD ///////
 

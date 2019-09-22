@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Definitions.h"
 #include "UE4_PlaygroundBlock.generated.h"
 
 /** A block that can be clicked */
@@ -69,9 +70,7 @@ public:
 
 	FORCEINLINE bool IsActive() const { return bActive; }
 
-	FORCEINLINE void SetActive(bool active)  { bActive = active; }
-
-	FORCEINLINE int32 GetType() const { return BlockType; }
+	FORCEINLINE void SetActive(bool active)  { bActive = active; }	
 
 	FORCEINLINE int32 GetRow() const { return RowInGrid; }
 
@@ -81,21 +80,21 @@ public:
 
 	FORCEINLINE void SetCol(int32 col) { ColInGrid = col; }
 
-	//void InitializeBlock(int32 row, int32 col);
+	FORCEINLINE ETILETYPE GetType() const { return BlockType; }
 
-	void SetBlockType(int32 type);
+	void SetBlockType(ETILETYPE type);
 
 private:
 
 	bool bActive;
 
-	int32 BlockType;
+	ETILETYPE BlockType;
+
+	int32 CurrentClicks;
 
 	int32 RowInGrid;
 
 	int32 ColInGrid;
-
-	
 };
 
 
