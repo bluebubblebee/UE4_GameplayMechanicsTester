@@ -14,6 +14,8 @@ enum class ETILETYPE : uint8
 	VE_TURN_RIGHT		UMETA(DisplayName = "TurnRight"),
 	VE_TURN_LEFT		UMETA(DisplayName = "TurnRight"),
 	VE_STRAIGHT		UMETA(DisplayName = "Straight"),
+	VE_START       UMETA(DisplayName = "Start"),
+	VE_END       UMETA(DisplayName = "End"),
 };
 
 

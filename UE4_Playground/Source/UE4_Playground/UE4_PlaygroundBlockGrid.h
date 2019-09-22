@@ -84,13 +84,24 @@ private:
 
 	int32 CurrentColMainChar;
 
+	
+
+	UFUNCTION()
+	void OnCharacterEndOfMove();
+
 	///// MAIN CHARACTER ///////
 
 private:
 	///// BIT BOARD ///////
 
-	// Grid Representation, long is 64 bits
+	// Start, End Tiles
+	int32 StartRow;
+	int32 StartCol;
 
+	int32 EndRow;
+	int32 EndCol;
+
+	// Grid Representation, long is 64 bits
 	// long long int, 64 bits. Bit board represeting the blocks
 	int64_t BlocksBitboard; 
 
@@ -110,7 +121,14 @@ private:
 
 	bool GetTileState(const int64_t& bitBoard, const int32& row, const int32& column)  const;
 
+	FString BitsToString(const int64_t& bitBoard);
+
+
 	ETILETYPE GetTileType(const int32 row, const int32 column);
+
+	ETILETYPE GetNextTileType(ETILETYPE currentType);
+
+
 
 	///// BIT BOARD ///////
 

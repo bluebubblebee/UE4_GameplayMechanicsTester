@@ -23,17 +23,59 @@ void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bIsMoving)
+	{
+		CurrentDistance = FVector::Distance(GetActorLocation(), StartLocation);
+
+		if (CurrentDistance < TotalDistance)
+		{
+
+			FVector NewLocation = GetActorLocation();
+
+			NewLocation += Direction * Speed * DeltaTime;
+
+			SetActorLocation(NewLocation);
+
+		}
+		else
+		{
+			//bIsReachTargetLocation = true;
+
+			bIsMoving = false;
+
+			SetActorLocation(TargetLocation);
+
+			// Launch OnEndMovement event
+			OnEndMovement.Broadcast();
+
+			FRotator newRotation = GetActorRotation() + FRotator(0.0f, 90.0f, 0.0f);
+			SetActorRotation(newRotation);
+		}
+
+	}
 }
 
-void AMainCharacter::MoveToPosition(FVector position)
-{
 
-}
 
 // Called to bind functionality to input
 void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+
+void AMainCharacter::MoveToPosition(FVector position)
+{
+	TargetLocation = position;
+	StartLocation = GetActorLocation();
+	TotalDistance = FVector::Distance(StartLocation, TargetLocation);
+
+	Direction = TargetLocation - StartLocation;
+	Direction.Normalize();
+
+	CurrentDistance = 0.0f;
+
+	bIsMoving = true;
 }
 
