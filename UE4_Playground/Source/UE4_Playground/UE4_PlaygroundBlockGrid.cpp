@@ -31,6 +31,9 @@ AUE4_PlaygroundBlockGrid::AUE4_PlaygroundBlockGrid()
 
 
 	BlocksBitboard = 0;
+	TurnRightBlocksBitboard = 0;
+	TurnLeftBlocksBitboard = 0;
+	StraightBlocksBitboard = 0;
 
 }
 
@@ -118,7 +121,7 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 				{
 					UE_LOG(LogTemp, Warning, TEXT("GetTileState it's a block %d , %d"), row, col);
 
-					NewBlock->SetBlockType(ETILETYPE::VE_BLOCKED);
+					NewBlock->SetType(ETILETYPE::VE_BLOCKED);
 				}
 			}
 
@@ -136,67 +139,89 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 	}
 }
 
+void AUE4_PlaygroundBlockGrid::HandleClickedOnBlock(class AUE4_PlaygroundBlock* Block)
+{
+	// Get type tyle clicked
+	ETILETYPE tileType = GetTileType(Block->GetRow(), Block->GetCol());
+
+	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] %s - %s "), *Block->GetActorLabel(), *GetEnumValueAsString<ETILETYPE>("ETILETYPE", tileType));
+	
+	// Prevent from clicking on Blocked tiles
+	if (tileType == ETILETYPE::VE_BLOCKED) return;
+
+
+	if (tileType == ETILETYPE::VE_BASE)
+	{
+		NumberBlocksClicked++;
+	}
+
+	
+	// If it different of VE_BASE , Remove that type
+	if (tileType != ETILETYPE::VE_BASE)
+	{
+		switch (tileType)
+		{
+		case ETILETYPE::VE_TURN_RIGHT:
+			UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Remove: TurnRight "));
+			TurnRightBlocksBitboard = RemoveTileState(TurnRightBlocksBitboard, Block->GetRow(), Block->GetCol());
+
+			break;
+		case ETILETYPE::VE_TURN_LEFT:
+			UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Remove: TurnLeft "));
+			TurnLeftBlocksBitboard = RemoveTileState(TurnLeftBlocksBitboard, Block->GetRow(), Block->GetCol());
+
+			break;
+		case ETILETYPE::VE_STRAIGHT:
+			UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Remove: Straight "));
+			StraightBlocksBitboard = RemoveTileState(StraightBlocksBitboard, Block->GetRow(), Block->GetCol());
+
+			break;
+		}
+	}
+
+	// Get next tile and set it, rotate if last type
+
+	if (tileType == ETILETYPE::VE_BASE)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Add: TurnRight "));
+
+		TurnRightBlocksBitboard = SetTileState(TurnRightBlocksBitboard, Block->GetRow(), Block->GetCol());
+
+		Block->SetType(ETILETYPE::VE_TURN_RIGHT);
+
+	}
+	else if (tileType == ETILETYPE::VE_TURN_LEFT)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Add: Straight "));
+
+		StraightBlocksBitboard = SetTileState(StraightBlocksBitboard, Block->GetRow(), Block->GetCol());
+
+		Block->SetType(ETILETYPE::VE_STRAIGHT);
+	}
+	else if (tileType == ETILETYPE::VE_TURN_RIGHT)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Add: TurnLeft "));
+
+		TurnLeftBlocksBitboard = SetTileState(TurnLeftBlocksBitboard, Block->GetRow(), Block->GetCol());
+
+		Block->SetType(ETILETYPE::VE_TURN_LEFT);
+	}
+	else if (tileType == ETILETYPE::VE_STRAIGHT)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Add: TurnLeft "));
+
+		TurnLeftBlocksBitboard = SetTileState(TurnLeftBlocksBitboard, Block->GetRow(), Block->GetCol());
+
+		Block->SetType(ETILETYPE::VE_TURN_LEFT);
+	}
+
+	//UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] %s - (NextTile) %s "), *Block->GetActorLabel(), *GetEnumValueAsString<ETILETYPE>("ETILETYPE", nextTile));
+	
+}
+
 
 void AUE4_PlaygroundBlockGrid::SetBlockClicked(class AUE4_PlaygroundBlock* Block)
 {
-
-	if (!Block->IsActive())
-	{
-		Block->SetActive(true);
-
-		NumberBlocksClicked++;
-	}	
-
-	LastBlockClicked = Block;
-
-	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::SetBlockClicked] %s: Type %d - (%d, %d) ->  NumberBlocksClicked: %d"), *Block->GetActorLabel(), Block->GetType(), Block->GetRow(), Block->GetCol(), NumberBlocksClicked);
-
-	if (NumberBlocksClicked >= MaximunBlockClicks)
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::SetBlockClicked] Reached max clicks"));
-	}
-
-	// Check billboard
-	
-	// Check tiles 
-	// Check on that position there was a tile
-	if (GetTileState(TurnRightBlocksBitboard, Block->GetRow(), Block->GetCol()))
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::SetBlockClicked] %s (%d ,%d) = TurnRightBlocksBitboard"), *Block->GetActorLabel(), Block->GetRow(), Block->GetCol());
-		
-		// Removed state
-		TurnRightBlocksBitboard = RemoveTileState(TurnRightBlocksBitboard, Block->GetRow(), Block->GetCol());
-	}
-
-	if (GetTileState(TurnLeftBlocksBitboard, Block->GetRow(), Block->GetCol()))
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::SetBlockClicked] %s (%d ,%d) = TurnLeftBlocksBitboard"), *Block->GetActorLabel(), Block->GetRow(), Block->GetCol());
-		TurnLeftBlocksBitboard = RemoveTileState(TurnLeftBlocksBitboard, Block->GetRow(), Block->GetCol());
-	}
-
-
-	if (GetTileState(StraightBlocksBitboard, Block->GetRow(), Block->GetCol()))
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::SetBlockClicked] %s (%d ,%d) = StraightBlocksBitboard"), *Block->GetActorLabel(), Block->GetRow(), Block->GetCol());
-		StraightBlocksBitboard = RemoveTileState(StraightBlocksBitboard, Block->GetRow(), Block->GetCol());
-	}
-
-
-
-	switch (Block->GetType())
-	{
-	case ETILETYPE::VE_TURN_RIGHT:
-		
-		// Set TurnRight for this cell
-		TurnRightBlocksBitboard = SetTileState(TurnRightBlocksBitboard, Block->GetRow(), Block->GetCol());
-		break;
-	case ETILETYPE::VE_TURN_LEFT:
-		TurnLeftBlocksBitboard = SetTileState(TurnLeftBlocksBitboard, Block->GetRow(), Block->GetCol());
-		break;
-	case ETILETYPE::VE_STRAIGHT:
-		StraightBlocksBitboard = SetTileState(StraightBlocksBitboard, Block->GetRow(), Block->GetCol());
-		break;
-	}
 }
 
 void AUE4_PlaygroundBlockGrid::AddScore()
@@ -274,8 +299,6 @@ int64_t AUE4_PlaygroundBlockGrid::RemoveTileState(const int64_t& bitBoard, const
 bool AUE4_PlaygroundBlockGrid::GetTileState(const int64_t& bitBoard, const int32& row, const int32& column) const
 {
 	//UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundBlockGrid::GetTileState %ld - ( %d , %d )"), bitBoard, row, column);
-
-	//long mask = 1uLL << (row * Width + column);
 	int64_t mask = 1LL << (row * Width + column);
 
 	return ((mask & bitBoard) != 0);
@@ -284,28 +307,34 @@ bool AUE4_PlaygroundBlockGrid::GetTileState(const int64_t& bitBoard, const int32
 
 ETILETYPE AUE4_PlaygroundBlockGrid::GetTileType(const int32 row, const int32 column)
 {
+	ETILETYPE tile = ETILETYPE::VE_BASE;
+
+
 	if (GetTileState(BlocksBitboard, row, column))
 	{
-		return ETILETYPE::VE_BLOCKED;
-	}
+		UE_LOG(LogTemp, Warning, TEXT("[GetTileType.BlocksBitboard]  "));
+		tile = ETILETYPE::VE_BLOCKED;
 
-	if (GetTileState(TurnRightBlocksBitboard, row, column))
+	}
+	else if (GetTileState(TurnLeftBlocksBitboard, row, column))
 	{
-		return ETILETYPE::VE_TURN_RIGHT;
-	}
+		tile = ETILETYPE::VE_TURN_LEFT;
+		UE_LOG(LogTemp, Warning, TEXT("[GetTileType.TurnLeft]  "));
 
-	if (GetTileState(TurnLeftBlocksBitboard, row, column))
+	}
+	else if (GetTileState(TurnRightBlocksBitboard, row, column))
 	{
-		return ETILETYPE::VE_TURN_LEFT;
+		tile = ETILETYPE::VE_TURN_RIGHT;
+		UE_LOG(LogTemp, Warning, TEXT("[GetTileType.TurnRight]  "));
 	}
 
-
-	if (GetTileState(StraightBlocksBitboard, row, column))
+	else if (GetTileState(StraightBlocksBitboard, row, column))
 	{
-		return ETILETYPE::VE_STRAIGHT;
+		tile = ETILETYPE::VE_STRAIGHT;
+		UE_LOG(LogTemp, Warning, TEXT("[GetTileType.Staright]  "));
 	}
 
-	return ETILETYPE::VE_NONE;
+	return tile;
 }
 
 ///// BIT BOARD ///////

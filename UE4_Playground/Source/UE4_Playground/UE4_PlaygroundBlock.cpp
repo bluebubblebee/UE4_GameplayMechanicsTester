@@ -58,10 +58,7 @@ AUE4_PlaygroundBlock::AUE4_PlaygroundBlock()
 	MaterialBlock = ConstructorStatics.MBlock.Get();
 	MaterialStraight = ConstructorStatics.MStraight.Get();
 
-	//BlockMesh->SetMaterial(0, BaseMaterial);
-	CurrentClicks = (int)ETILETYPE::VE_TURN_RIGHT;
-	bActive = false;
-
+	//Type = ETILETYPE::VE_BASE;
 }
 
 void AUE4_PlaygroundBlock::BlockClicked(UPrimitiveComponent* ClickedComp, FKey ButtonClicked)
@@ -84,27 +81,27 @@ void AUE4_PlaygroundBlock::HandleClicked()
 	//}
 
 	// Prevent to click on blocked
-	if (BlockType == ETILETYPE::VE_BLOCKED) return;
+	//if (BlockType == ETILETYPE::VE_BLOCKED) return;
 
-	OwningGrid->SetBlockClicked(this);
+	//OwningGrid->SetBlockClicked(this);
 
-	SetBlockType((ETILETYPE)CurrentClicks);
+	//SetBlockType((ETILETYPE)CurrentClicks);
 
-	CurrentClicks++;
+	/*CurrentClicks++;
 
 	if (CurrentClicks > ((int)ETILETYPE::VE_STRAIGHT))
 	{
 		BlockType = ETILETYPE::VE_TURN_RIGHT; // Don't add block 0
-	}
+	}*/
 
 }
 
 
-void AUE4_PlaygroundBlock::SetBlockType(ETILETYPE type)
+void AUE4_PlaygroundBlock::SetType(ETILETYPE type)
 {
-	BlockType = type;
+	//Type = type;
 
-	switch (BlockType)
+	switch (type)
 	{
 	case ETILETYPE::VE_BLOCKED:
 		BlockMesh->SetMaterial(0, MaterialBlock);
@@ -114,6 +111,7 @@ void AUE4_PlaygroundBlock::SetBlockType(ETILETYPE type)
 		BlockMesh->SetMaterial(0, MaterialTurnRight);
 		break;
 	case ETILETYPE::VE_TURN_LEFT:
+
 		BlockMesh->SetMaterial(0, MaterialTurnLeft);
 		break;
 	case ETILETYPE::VE_STRAIGHT:

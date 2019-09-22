@@ -8,8 +8,9 @@
 UENUM(BlueprintType)
 enum class ETILETYPE : uint8
 {
-	VE_NONE 	UMETA(DisplayName = "None"),
+	
 	VE_BLOCKED 	UMETA(DisplayName = "Blocked"),
+	VE_BASE 	UMETA(DisplayName = "Base"),
 	VE_TURN_RIGHT		UMETA(DisplayName = "TurnRight"),
 	VE_TURN_LEFT		UMETA(DisplayName = "TurnRight"),
 	VE_STRAIGHT		UMETA(DisplayName = "Straight"),

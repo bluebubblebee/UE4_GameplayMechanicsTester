@@ -59,6 +59,8 @@ public:
 
 	void StartAction();
 
+	void HandleClickedOnBlock(class AUE4_PlaygroundBlock* Block);
+
 	void SetBlockClicked(class AUE4_PlaygroundBlock* Block);
 
 	FORCEINLINE class USceneComponent* GetDummyRoot() const { return DummyRoot; }

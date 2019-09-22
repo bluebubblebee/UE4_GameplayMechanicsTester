@@ -68,9 +68,9 @@ public:
 	/** Returns BlockMesh subobject **/
 	FORCEINLINE class UStaticMeshComponent* GetBlockMesh() const { return BlockMesh; }
 
-	FORCEINLINE bool IsActive() const { return bActive; }
+	//FORCEINLINE bool IsActive() const { return bActive; }
 
-	FORCEINLINE void SetActive(bool active)  { bActive = active; }	
+	//FORCEINLINE void SetActive(bool active)  { bActive = active; }	
 
 	FORCEINLINE int32 GetRow() const { return RowInGrid; }
 
@@ -80,17 +80,17 @@ public:
 
 	FORCEINLINE void SetCol(int32 col) { ColInGrid = col; }
 
-	FORCEINLINE ETILETYPE GetType() const { return BlockType; }
+	//FORCEINLINE ETILETYPE GetType() const { return Type; }
 
-	void SetBlockType(ETILETYPE type);
+	void SetType(ETILETYPE type);
 
 private:
 
-	bool bActive;
+	//bool bActive;
 
-	ETILETYPE BlockType;
+	//ETILETYPE Type;
 
-	int32 CurrentClicks;
+	//int32 CurrentClicks;
 
 	int32 RowInGrid;
 
