@@ -101,27 +101,21 @@ private:
 	int32 EndRow;
 	int32 EndCol;
 
-	// Grid Representation, long is 64 bits
-	// long long int, 64 bits. Bit board represeting the blocks
-	int64_t BlocksBitboard; 
-
-	// long long int, 64 bits. Bit board represeting Straight in the grid
-	int64_t StraightBlocksBitboard; 
-
-	// long long int, 64 bits. Bit board represeting Straight in the grid
-	int64_t TurnLeftBlocksBitboard;
-
-	// long long int, 64 bits. Bit board represeting Straight in the grid
-	int64_t TurnRightBlocksBitboard;
+	// Grid Representation as long long int, 64 bits.
+	// Each int64_t represents a tile type
+	int64_t BlockedTilesBitboard;
+	int64_t StraightTilesBitboard;
+	int64_t TurnLeftTilesBitboard;
+	int64_t TurnRightTilesBitboard;
 
 	
-	int64_t SetTileState(const int64_t& bitBoard, const int32& row, const int32& column);
+	int64_t ToggleTile(const int64_t& bitBoard, const int32& row, const int32& column);
 
-	int64_t RemoveTileState(const int64_t& bitBoard, const int32& row, const int32& column);
+	//int64_t RemoveTileState(const int64_t& bitBoard, const int32& row, const int32& column);
 
 	bool GetTileState(const int64_t& bitBoard, const int32& row, const int32& column)  const;
 
-	FString BitsToString(const int64_t& bitBoard);
+	//FString BitsToString(const int64_t& bitBoard);
 
 
 	ETILETYPE GetTileType(const int32 row, const int32 column);
