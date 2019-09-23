@@ -24,7 +24,7 @@ AUE4_PlaygroundBlockGrid::AUE4_PlaygroundBlockGrid()
 	ScoreText->SetupAttachment(DummyRoot);
 
 	MaximunBlockClicks = 10;
-	BlockSpacing = 265.0f;
+	TileSpacing = 265.0f;
 	Width = 8;
 	Height = 8;
 	NumberBlocksClicked = 0;
@@ -85,7 +85,7 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 	//UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundBlockGrid::GridBitboard %lu"), GridBitboard);
 
 
-	if (BlockClass == nullptr) return;
+	if (TileClass == nullptr) return;
 
 	StartRow = 0;
 	StartCol = 1;
@@ -100,30 +100,30 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 	{
 		for (int32 row = 0; row < Height; row++)
 		{		
-			XOffset = col * BlockSpacing;
-			YOffset = row * BlockSpacing;
-			const FVector BlockLocation = FVector(YOffset, XOffset, 0.0f) + GetActorLocation();
+			XOffset = col * TileSpacing;
+			YOffset = row * TileSpacing;
+			const FVector TileLocation = FVector(YOffset, XOffset, 0.0f) + GetActorLocation();
 
-			AUE4_PlaygroundBlock* NewBlock = GetWorld()->SpawnActor<AUE4_PlaygroundBlock>(BlockClass, BlockLocation, FRotator(0, 0, 0));			
+			AUE4_PlaygroundBlock* NewTile = GetWorld()->SpawnActor<AUE4_PlaygroundBlock>(TileClass, TileLocation, FRotator(0, 0, 0));
 
 			// Tell the block about its owner
-			if (NewBlock != nullptr)
+			if (NewTile != nullptr)
 			{
-				NewBlock->OwningGrid = this;
+				NewTile->OwningGrid = this;
 
-				int32 id = (row * Width + col);;
-				FString cellName = "Cell " + FString::FromInt(id) + " (" + FString::FromInt(row) + "," + FString::FromInt(col) + ")";
+				int32 index = (row * Width + col);;
+				FString cellName = "Cell " + FString::FromInt(index) + " (" + FString::FromInt(row) + "," + FString::FromInt(col) + ")";
 
-				NewBlock->SetActorLabel(cellName);
-				NewBlock->SetRow(row);
-				NewBlock->SetCol(col);
+				NewTile->SetActorLabel(cellName);
+				NewTile->SetRow(row);
+				NewTile->SetCol(col);
 
 				// Check if it's a block
 				if (GetTileState(BlockedTilesBitboard, row, col))
 				{
 					UE_LOG(LogTemp, Warning, TEXT("GetTileState it's a block %d , %d"), row, col);
 
-					NewBlock->SetType(ETILETYPE::VE_BLOCKED);
+					NewTile->SetType(ETILETYPE::VE_BLOCKED);
 				}
 			}
 
@@ -252,8 +252,8 @@ void AUE4_PlaygroundBlockGrid::StartAction()
 	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Next Tyle: %d %s "), type, *typeName);
 
 
-	float xPostion = CurrentColMainChar * BlockSpacing;
-	float yPostion = CurrentRowMainChar * BlockSpacing;
+	float xPostion = CurrentColMainChar * TileSpacing;
+	float yPostion = CurrentRowMainChar * TileSpacing;
 
 
 
@@ -274,20 +274,6 @@ void AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove()
 }
 
 
-
-///// BIT BOARD ///////
-// Sets the a cell state in the bitboard
-/*int64_t AUE4_PlaygroundBlockGrid::ToggleTile(const int64_t& bitBoard, const int32& row, const int32& column)
-{
-	//UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundBlockGrid::SetTileState %l - ( %d , %d )"), bitBoard, row, column);
-
-	// Set the bit in the correct position for the bitboard
-	int64_t newBit = 1LL << (row * Width + column);
-
-	newBit |= bitBoard;
-
-	return (newBit);
-}*/
 
 //  Toggles 1 bit with XOR Bitwise operation (^)  to a given bitboard, in a ceratan row and column
 int64_t AUE4_PlaygroundBlockGrid::ToggleTile(const int64_t& bitBoard, const int32& row, const int32& column)

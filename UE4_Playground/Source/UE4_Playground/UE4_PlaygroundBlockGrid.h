@@ -34,13 +34,10 @@ protected:
 	// End AActor interface
 
 	UPROPERTY(EditDefaultsOnly, Category = "Grid Settings")
-    TSubclassOf<class AUE4_PlaygroundBlock> BlockClass;
+    TSubclassOf<class AUE4_PlaygroundBlock> TileClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Grid Settings")
-	TSubclassOf<class AMainCharacter> MainCharacterClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Grid Settings")
-	int MaximunBlockClicks;
+	float TileSpacing;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Grid Settings")
 	int32 Width;
@@ -49,7 +46,14 @@ protected:
 	int32 Height;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Grid Settings")
-	float BlockSpacing;
+	TSubclassOf<class AMainCharacter> MainCharacterClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Grid Settings")
+	int MaximunBlockClicks;
+
+	
+
+	
 
 
 public:
@@ -82,9 +86,7 @@ private:
 
 	int32 CurrentRowMainChar;
 
-	int32 CurrentColMainChar;
-
-	
+	int32 CurrentColMainChar;	
 
 	UFUNCTION()
 	void OnCharacterEndOfMove();
@@ -111,22 +113,13 @@ private:
 	
 	int64_t ToggleTile(const int64_t& bitBoard, const int32& row, const int32& column);
 
-	//int64_t RemoveTileState(const int64_t& bitBoard, const int32& row, const int32& column);
-
 	bool GetTileState(const int64_t& bitBoard, const int32& row, const int32& column)  const;
-
-	//FString BitsToString(const int64_t& bitBoard);
-
 
 	ETILETYPE GetTileType(const int32 row, const int32 column);
 
 	ETILETYPE GetNextTileType(ETILETYPE currentType);
 
-
-
 	///// BIT BOARD ///////
-
-
 
 };
 
