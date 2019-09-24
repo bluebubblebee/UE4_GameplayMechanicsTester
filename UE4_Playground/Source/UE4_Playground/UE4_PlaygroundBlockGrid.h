@@ -8,7 +8,7 @@
 
 #include "UE4_PlaygroundBlockGrid.generated.h"
 
-/** Class used to spawn blocks and manage score */
+// Class Grid to manage the path for the character
 UCLASS(minimalapi)
 class AUE4_PlaygroundBlockGrid : public AActor
 {
@@ -45,16 +45,22 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Grid Settings")
 	int32 Height;
 
+	// Start, End Tiles
+	UPROPERTY(BlueprintReadOnly, Category = "Grid Settings")
+	int32 StartRow;
+	UPROPERTY(BlueprintReadOnly, Category = "Grid Settings")
+	int32 StartCol;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Grid Settings")
+	int32 EndRow;
+	UPROPERTY(BlueprintReadOnly, Category = "Grid Settings")
+	int32 EndCol;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Grid Settings")
 	TSubclassOf<class AMainCharacter> MainCharacterClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Grid Settings")
-	int MaximunBlockClicks;
-
-	
-
-	
-
+	int MaximunTileClicks;
 
 public:
 
@@ -76,7 +82,7 @@ private:
 
 	int32 Score;
 
-	int32 NumberBlocksClicked;
+	int32 NumberTileClicked;
 
 	class AUE4_PlaygroundBlock* LastBlockClicked = nullptr;
 
@@ -96,12 +102,7 @@ private:
 private:
 	///// BIT BOARD ///////
 
-	// Start, End Tiles
-	int32 StartRow;
-	int32 StartCol;
-
-	int32 EndRow;
-	int32 EndCol;
+	
 
 	// Grid Representation as long long int, 64 bits.
 	// Each int64_t represents a tile type

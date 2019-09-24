@@ -64,6 +64,45 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+void AMainCharacter::WalkPath(TArray<ETILETYPE> TileListToWalk)
+{
+	TileList = TileListToWalk;
+	CurrentTile = 0;
+
+
+}
+
+
+void AMainCharacter::DecideNextTile()
+{
+	if (CurrentTile < TileList.Num())
+	{
+		switch (TileList[CurrentTile])
+		{
+			case ETILETYPE::VE_STRAIGHT:
+
+				// Set target position
+
+			break;
+			case ETILETYPE::VE_TURN_LEFT:
+
+				break;
+			case ETILETYPE::VE_TURN_RIGHT:
+
+				break;
+				case ETILETYPE::VE_END:
+
+				// TODO: VICTORY ANIMATION
+
+				break;
+		}
+	}
+
+
+	// TODO: IF NOT END TILE FOUND, DEFEAT ANIMATION
+}
+
+
 
 void AMainCharacter::MoveToPosition(FVector position)
 {

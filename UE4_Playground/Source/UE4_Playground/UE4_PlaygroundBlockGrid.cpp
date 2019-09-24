@@ -23,12 +23,17 @@ AUE4_PlaygroundBlockGrid::AUE4_PlaygroundBlockGrid()
 	ScoreText->SetText(FText::Format(LOCTEXT("ScoreFmt", "Score: {0}"), FText::AsNumber(0)));
 	ScoreText->SetupAttachment(DummyRoot);
 
-	MaximunBlockClicks = 10;
+	MaximunTileClicks = 10;
 	TileSpacing = 265.0f;
 	Width = 8;
 	Height = 8;
-	NumberBlocksClicked = 0;
+	NumberTileClicked = 0;
 
+	StartRow = 0;
+	StartCol = 1;
+
+	EndRow = 6;
+	EndCol = 6;
 
 	BlockedTilesBitboard = 0;
 	TurnRightTilesBitboard = 0;
@@ -87,11 +92,9 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 
 	if (TileClass == nullptr) return;
 
-	StartRow = 0;
-	StartCol = 1;
+	
 	CurrentRowMainChar = StartRow;
 	CurrentColMainChar = StartCol;
-
 
 	float XOffset = 0.0f;
 	float YOffset = 0.0f;
@@ -139,6 +142,19 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 					MainCharacter->OnEndMovement.AddDynamic(this, &AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove);
 
 				}
+
+				if (NewTile != nullptr)
+				{
+					NewTile->SetType(ETILETYPE::VE_START);
+				}
+			}
+
+			if ((row == EndRow) && (col == EndCol))
+			{
+				if (NewTile != nullptr)
+				{
+					NewTile->SetType(ETILETYPE::VE_END);
+				}
 			}
 		}
 	}
@@ -146,6 +162,14 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 
 void AUE4_PlaygroundBlockGrid::HandleClickedOnBlock(class AUE4_PlaygroundBlock* Block)
 {
+	// Prevent from clicking on Start,EndRow and where the character is
+	if ((Block->GetRow() == StartRow) && (Block->GetCol() == StartCol)) return;
+
+	if ((Block->GetRow() == EndRow) && (Block->GetCol() == EndCol)) return;
+
+	if ((Block->GetRow() == CurrentRowMainChar) && (Block->GetCol() == CurrentColMainChar)) return;
+
+
 	// Get type tyle clicked
 	ETILETYPE tileType = GetTileType(Block->GetRow(), Block->GetCol());
 
@@ -154,12 +178,10 @@ void AUE4_PlaygroundBlockGrid::HandleClickedOnBlock(class AUE4_PlaygroundBlock* 
 	// Prevent from clicking on Blocked tiles
 	if (tileType == ETILETYPE::VE_BLOCKED) return;
 
-
 	if (tileType == ETILETYPE::VE_BASE)
 	{
-		NumberBlocksClicked++;
+		NumberTileClicked++;
 	}
-
 	
 	// If it different of VE_BASE , Remove that type
 	if (tileType != ETILETYPE::VE_BASE)
@@ -182,15 +204,14 @@ void AUE4_PlaygroundBlockGrid::HandleClickedOnBlock(class AUE4_PlaygroundBlock* 
 			
 			StraightTilesBitboard = ToggleTile(StraightTilesBitboard, Block->GetRow(), Block->GetCol());
 
-			UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Remove: Straight: "));
-
-			
+			UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Remove: Straight: "));			
 
 			break;
 		}
 	}
 
 
+	// Get next type of tile and toggle it
 	ETILETYPE nextType = GetNextTileType(tileType);
 	Block->SetType(nextType);
 

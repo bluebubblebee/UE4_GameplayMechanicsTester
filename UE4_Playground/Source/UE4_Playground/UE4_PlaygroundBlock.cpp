@@ -18,7 +18,10 @@ AUE4_PlaygroundBlock::AUE4_PlaygroundBlock()
 		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MTurnLeft;
 		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MTurnRight;
 		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MStraight;
-		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MBlock;  
+		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MBlock;   
+		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MStart;
+		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MExit;
+		
 
 		FConstructorStatics()
 			: PlaneMesh(TEXT("/Game/Art/Tiles/Tile.Tile"))
@@ -28,6 +31,9 @@ AUE4_PlaygroundBlock::AUE4_PlaygroundBlock()
 			, MTurnRight(TEXT("/Game/Art/Tiles/MI_TurnRight.MI_TurnRight"))
 			, MStraight(TEXT("/Game/Art/Tiles/MI_Straight.MI_Straight"))
 			, MBlock(TEXT("/Game/Art/Tiles/MI_Block.MI_Block"))
+			, MStart(TEXT("/Game/Art/Tiles/MI_Start.MI_Start"))
+			, MExit(TEXT("/Game/Art/Tiles/MI_Exit.MI_Exit"))
+			
 
 		{
 		}
@@ -53,12 +59,13 @@ AUE4_PlaygroundBlock::AUE4_PlaygroundBlock()
 	// Save a pointer to the orange material
 	BaseMaterial = ConstructorStatics.BaseMaterial.Get();
 
-	MaterialTurnLeft = ConstructorStatics.MTurnLeft.Get();
-	MaterialTurnRight = ConstructorStatics.MTurnRight.Get();
-	MaterialBlock = ConstructorStatics.MBlock.Get();
-	MaterialStraight = ConstructorStatics.MStraight.Get();
+	TurnLeftTileMaterial = ConstructorStatics.MTurnLeft.Get();
+	TurnRightTileMaterial = ConstructorStatics.MTurnRight.Get();
+	BlockTileMaterial = ConstructorStatics.MBlock.Get();
+	StraightTileMaterial = ConstructorStatics.MStraight.Get();
+	StartTileMaterial = ConstructorStatics.MStart.Get();
+	ExitTileMaterial = ConstructorStatics.MExit.Get();
 
-	//Type = ETILETYPE::VE_BASE;
 }
 
 void AUE4_PlaygroundBlock::BlockClicked(UPrimitiveComponent* ClickedComp, FKey ButtonClicked)
@@ -74,26 +81,13 @@ void AUE4_PlaygroundBlock::OnFingerPressedBlock(ETouchIndex::Type FingerIndex, U
 
 void AUE4_PlaygroundBlock::HandleClicked()
 {
-	// Check we are not already active
-	//if (!bActive)
-	//{
-		//bActive = true;
-	//}
 
-	// Prevent to click on blocked
-	//if (BlockType == ETILETYPE::VE_BLOCKED) return;
+	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlock::HandleClicked]"));
 
-	//OwningGrid->SetBlockClicked(this);
-
-	//SetBlockType((ETILETYPE)CurrentClicks);
-
-	/*CurrentClicks++;
-
-	if (CurrentClicks > ((int)ETILETYPE::VE_STRAIGHT))
+	if (OwningGrid != nullptr)
 	{
-		BlockType = ETILETYPE::VE_TURN_RIGHT; // Don't add block 0
-	}*/
-
+		OwningGrid->HandleClickedOnBlock(this);
+	}
 }
 
 
@@ -104,36 +98,27 @@ void AUE4_PlaygroundBlock::SetType(ETILETYPE type)
 	switch (type)
 	{
 	case ETILETYPE::VE_BLOCKED:
-		BlockMesh->SetMaterial(0, MaterialBlock);
+		BlockMesh->SetMaterial(0, BlockTileMaterial);
+		break;
+	
+	case ETILETYPE::VE_TURN_LEFT:
+
+		BlockMesh->SetMaterial(0, TurnLeftTileMaterial);
 		break;
 	case ETILETYPE::VE_TURN_RIGHT:
 
-		BlockMesh->SetMaterial(0, MaterialTurnRight);
-		break;
-	case ETILETYPE::VE_TURN_LEFT:
-
-		BlockMesh->SetMaterial(0, MaterialTurnLeft);
+		BlockMesh->SetMaterial(0, TurnRightTileMaterial);
 		break;
 	case ETILETYPE::VE_STRAIGHT:
-		BlockMesh->SetMaterial(0, MaterialStraight);
+		BlockMesh->SetMaterial(0, StraightTileMaterial);
+		break;
+	case ETILETYPE::VE_START:
+		BlockMesh->SetMaterial(0, StartTileMaterial);
+		break;
+	case ETILETYPE::VE_END:
+		BlockMesh->SetMaterial(0, ExitTileMaterial);
 		break;
 	}
 }
 
-void AUE4_PlaygroundBlock::Highlight(bool bOn)
-{
-	// Do not highlight if the block has already been activated.
-	/*if (bIsActive)
-	{
-		return;
-	}
 
-	if (bOn)
-	{
-		BlockMesh->SetMaterial(0, BaseMaterial);
-	}
-	else
-	{
-		BlockMesh->SetMaterial(0, BlueMaterial);
-	}*/
-}

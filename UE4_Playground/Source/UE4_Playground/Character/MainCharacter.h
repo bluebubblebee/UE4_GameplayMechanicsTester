@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Definitions.h"
 #include "MainCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndOfMoveDelegate);
@@ -34,13 +35,14 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Movement Settings")
 	float Speed = 100.0f;
-	
-private:
 
+
+	UPROPERTY(EditDefaultsOnly, Category = "Grid Settings")
+	float TileSpacing;
 	
+private:	
 
 	bool bIsMoving = false;
-
 	float CurrentDistance = 0.0f;
 	FVector StartLocation;
 	FVector TargetLocation;
@@ -52,5 +54,13 @@ public:
 	FEndOfMoveDelegate OnEndMovement;
 
 	void MoveToPosition(FVector position);
+
+	void WalkPath(TArray<ETILETYPE> TileListToWalk);
+
+	TArray<ETILETYPE> TileList;
+
+	int32 CurrentTile;
+
+	void DecideNextTile();
 
 };

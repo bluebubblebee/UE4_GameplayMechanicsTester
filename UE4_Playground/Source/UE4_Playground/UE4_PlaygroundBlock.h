@@ -7,8 +7,7 @@
 #include "Definitions.h"
 #include "UE4_PlaygroundBlock.generated.h"
 
-/** A block that can be clicked */
-//UCLASS(minimalapi)
+// Class Tile clicklable
 UCLASS()
 class AUE4_PlaygroundBlock : public AActor
 {
@@ -32,18 +31,24 @@ public:
 	UPROPERTY()
 	class UMaterial* BaseMaterial;
 
+	// Pointer to each material instace for the different tiles
+	UPROPERTY()
+	class UMaterialInstance* BlockTileMaterial;
 
 	UPROPERTY()
-	class UMaterialInstance* MaterialTurnLeft;
+	class UMaterialInstance* TurnLeftTileMaterial;
 
 	UPROPERTY()
-	class UMaterialInstance* MaterialTurnRight;
+	class UMaterialInstance* TurnRightTileMaterial;	
 
 	UPROPERTY()
-	class UMaterialInstance* MaterialBlock;
+	class UMaterialInstance* StraightTileMaterial;
 
 	UPROPERTY()
-	class UMaterialInstance* MaterialStraight;
+	class UMaterialInstance* StartTileMaterial;
+
+	UPROPERTY()
+	class UMaterialInstance* ExitTileMaterial;
 
 
 	/** Grid that owns us */
@@ -60,17 +65,11 @@ public:
 
 	void HandleClicked();
 
-	void Highlight(bool bOn);
-
 public:
 	/** Returns DummyRoot subobject **/
 	FORCEINLINE class USceneComponent* GetDummyRoot() const { return DummyRoot; }
 	/** Returns BlockMesh subobject **/
 	FORCEINLINE class UStaticMeshComponent* GetBlockMesh() const { return BlockMesh; }
-
-	//FORCEINLINE bool IsActive() const { return bActive; }
-
-	//FORCEINLINE void SetActive(bool active)  { bActive = active; }	
 
 	FORCEINLINE int32 GetRow() const { return RowInGrid; }
 
@@ -80,21 +79,13 @@ public:
 
 	FORCEINLINE void SetCol(int32 col) { ColInGrid = col; }
 
-	//FORCEINLINE ETILETYPE GetType() const { return Type; }
-
 	void SetType(ETILETYPE type);
 
 private:
 
-	//bool bActive;
-
-	//ETILETYPE Type;
-
-	//int32 CurrentClicks;
-
 	int32 RowInGrid;
-
 	int32 ColInGrid;
+
 };
 
 

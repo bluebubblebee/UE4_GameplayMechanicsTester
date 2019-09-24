@@ -17,20 +17,13 @@ public:
 
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
-	virtual void CalcCamera(float DeltaTime, struct FMinimalViewInfo& OutResult) override;
-
 protected:
 
 	virtual void BeginPlay() override;
 
-
-	void TriggerClick();
-	void TraceForBlock(const FVector& Start, const FVector& End, bool bDrawDebugHelpers);	
-
 	void StartAction();
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite)
-	class AUE4_PlaygroundBlock* CurrentBlockFocus;	
-
+private: 
+	
 	class AUE4_PlaygroundBlockGrid* CurrentGrid;
 };
