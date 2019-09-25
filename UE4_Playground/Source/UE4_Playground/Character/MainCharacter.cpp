@@ -78,6 +78,29 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void AMainCharacter::MoveToDirection(EDIRECTION direction, float distance)
 {
+
+	FVector NewLocation = GetActorLocation();
+
+	switch (direction)
+	{
+	case EDIRECTION::VE_UP:
+		NewLocation.X += distance;
+		break;
+	case EDIRECTION::VE_DOWN:
+		NewLocation.X -= distance;
+		break;
+	case EDIRECTION::VE_LEFT:
+		NewLocation.Y -= distance;
+		break;
+	case EDIRECTION::VE_RIGHT:
+		NewLocation.Y += distance;
+		break;
+	}
+	SetActorLocation(NewLocation);
+
+
+	/*
+
 	if (bIsMoving) return;
 		 
 	CurrentDistance = 0.0f;
@@ -112,6 +135,7 @@ void AMainCharacter::MoveToDirection(EDIRECTION direction, float distance)
 	UE_LOG(LogTemp, Warning, TEXT("About to move: %f / %f"), CurrentDistance, TotalDistance);
 
 	bIsMoving = true;
+	*/
 }
 
 void AMainCharacter::RotateToDirection(EDIRECTION direction)

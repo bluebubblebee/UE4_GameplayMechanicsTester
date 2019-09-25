@@ -30,6 +30,8 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float DeltaTime) override;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Grid Settings")
     TSubclassOf<class AUE4_PlaygroundBlock> TileClass;
 
@@ -76,7 +78,7 @@ public:
 private:
 
 	int32 Score;
-
+	
 	bool bIsInputLocked;
 
 	int32 NumberTileClicked;
@@ -93,6 +95,12 @@ private:
 
 	UFUNCTION()
 	void OnCharacterEndOfMove();
+
+	void MoveToNextTile();
+
+	bool bWaitForNextMove;
+
+	float waitDeltaTime;
 
 	///// MAIN CHARACTER ///////
 

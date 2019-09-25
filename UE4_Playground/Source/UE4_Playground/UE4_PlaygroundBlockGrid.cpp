@@ -37,6 +37,10 @@ AUE4_PlaygroundBlockGrid::AUE4_PlaygroundBlockGrid()
 	TurnRightTilesBitboard = 0;
 	TurnLeftTilesBitboard = 0;
 	StraightTilesBitboard = 0;
+
+	bWaitForNextMove = false;
+
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 
@@ -150,6 +154,31 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 	currentTile = ETILETYPE::VE_BASE;
 	currentDirection = EDIRECTION::VE_NONE;
 	bIsInputLocked = false;
+	bWaitForNextMove = false;
+}
+
+
+void AUE4_PlaygroundBlockGrid::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	//UE_LOG(LogTemp, Warning, TEXT(" AUE4_PlaygroundBlockGrid::Tick:  %f "), waitDeltaTime);
+
+	if (bWaitForNextMove)
+	{
+		waitDeltaTime += DeltaTime;
+
+		if (waitDeltaTime >= 1.0f)
+		{
+
+			waitDeltaTime = 0.0f;
+			bWaitForNextMove = false;
+
+			MoveToNextTile();
+
+			
+		}
+	}
 }
 
 
@@ -230,62 +259,46 @@ void AUE4_PlaygroundBlockGrid::AddScore()
 }
 
 
-///// MAIN CHARACTER: Path ///////
-void AUE4_PlaygroundBlockGrid::StartAction()
+void AUE4_PlaygroundBlockGrid::MoveToNextTile()
 {
-	if (bIsInputLocked) return;
-
-	if (MainCharacter == nullptr) return;  	 
-
-	// Start Path
-	CurrentRowMainChar += 1;
-
-	currentDirection = EDIRECTION::VE_UP;
 
 	currentTile = GetTileType(CurrentRowMainChar, CurrentColMainChar);
 
-	MainCharacter->MoveToDirection(currentDirection, TileSpacing);	
+	if (currentTile == ETILETYPE::VE_START)
+	{
 
-	bIsInputLocked = true;
-}
+		// Start Path
+		CurrentRowMainChar += 1;
 
-void AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove()
-{
-	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove] - (%d, %d): CurrentTile: %s - lastDirection: %s"), CurrentRowMainChar, CurrentColMainChar, *GetEnumValueAsString<ETILETYPE>("ETILETYPE", currentTile), *GetEnumValueAsString<EDIRECTION>("EDIRECTION", currentDirection));
+		currentDirection = EDIRECTION::VE_UP;
 
-	EDIRECTION dirCharacter = currentDirection;
+
+
+		//MainCharacter->MoveToDirection(currentDirection, TileSpacing);
+	}
 
 	if (currentTile == ETILETYPE::VE_STRAIGHT)
 	{
-		
-
 		if (currentDirection == EDIRECTION::VE_UP)
 		{
 			CurrentRowMainChar += 1;
-
-			dirCharacter = EDIRECTION::VE_UP;
 		}
 		else if (currentDirection == EDIRECTION::VE_DOWN)
 		{
 			CurrentRowMainChar -= 1;
-
-			dirCharacter = EDIRECTION::VE_DOWN;
 		}
 		else if (currentDirection == EDIRECTION::VE_LEFT)
 		{
 			CurrentColMainChar -= 1;
-			dirCharacter = EDIRECTION::VE_LEFT;
 		}
 		else if (currentDirection == EDIRECTION::VE_RIGHT)
 		{
 			CurrentColMainChar += 1;
-			dirCharacter = EDIRECTION::VE_RIGHT;
 		}
 	}
 
 	else if (currentTile == ETILETYPE::VE_TURN_RIGHT)
 	{
-		dirCharacter = EDIRECTION::VE_LEFT;
 
 		// Change direction
 		if (currentDirection == EDIRECTION::VE_UP)
@@ -293,7 +306,7 @@ void AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove()
 			CurrentColMainChar += 1;
 			currentDirection = EDIRECTION::VE_RIGHT;
 
-			dirCharacter = EDIRECTION::VE_RIGHT;
+
 
 		}
 		else if (currentDirection == EDIRECTION::VE_LEFT)
@@ -301,14 +314,14 @@ void AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove()
 			CurrentRowMainChar += 1;
 			currentDirection = EDIRECTION::VE_UP;
 
-			dirCharacter = EDIRECTION::VE_UP;
+
 		}
 		else if (currentDirection == EDIRECTION::VE_RIGHT)
 		{
 			CurrentRowMainChar -= 1;
 			currentDirection = EDIRECTION::VE_DOWN;
 
-			dirCharacter = EDIRECTION::VE_DOWN;
+
 		}
 
 		MainCharacter->RotateToDirection(EDIRECTION::VE_RIGHT);
@@ -316,7 +329,6 @@ void AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove()
 
 	else if (currentTile == ETILETYPE::VE_TURN_LEFT)
 	{
-		dirCharacter = EDIRECTION::VE_LEFT;
 
 		// Change direction
 		if (currentDirection == EDIRECTION::VE_RIGHT)
@@ -324,15 +336,11 @@ void AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove()
 			CurrentRowMainChar += 1;
 			currentDirection = EDIRECTION::VE_UP;
 
-			dirCharacter = EDIRECTION::VE_UP;
-
 		}
 		else if (currentDirection == EDIRECTION::VE_UP)
 		{
 			CurrentColMainChar -= 1;
 			currentDirection = EDIRECTION::VE_LEFT;
-
-			dirCharacter = EDIRECTION::VE_LEFT;
 		}
 
 		MainCharacter->RotateToDirection(EDIRECTION::VE_LEFT);
@@ -350,13 +358,43 @@ void AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove()
 
 		UE_LOG(LogTemp, Warning, TEXT(" Keep going (tempTile):  %s "), *GetEnumValueAsString<ETILETYPE>("ETILETYPE", tempTile));
 
-		MainCharacter->MoveToDirection(dirCharacter, TileSpacing);
+		MainCharacter->MoveToDirection(currentDirection, TileSpacing);
+
+		
 
 		if (tempTile == ETILETYPE::VE_END)
 		{
 			UE_LOG(LogTemp, Warning, TEXT(" REACHED END!! "));
 		}
 	}
+
+
+	bWaitForNextMove = true;
+	waitDeltaTime = 0.0f;
+
+
+}
+///// MAIN CHARACTER: Path ///////
+void AUE4_PlaygroundBlockGrid::StartAction()
+{
+	if (bIsInputLocked) return;
+
+	if (MainCharacter == nullptr) return;  	 
+	
+	bWaitForNextMove = true;
+
+	waitDeltaTime = 0.0f;
+
+	//MoveToNextTile();
+
+	bIsInputLocked = true;
+}
+
+void AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove] - (%d, %d): CurrentTile: %s - lastDirection: %s"), CurrentRowMainChar, CurrentColMainChar, *GetEnumValueAsString<ETILETYPE>("ETILETYPE", currentTile), *GetEnumValueAsString<EDIRECTION>("EDIRECTION", currentDirection));
+
+	
 
 }
 ///// MAIN CHARACTER: Path ///////
