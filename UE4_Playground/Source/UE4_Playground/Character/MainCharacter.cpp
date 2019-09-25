@@ -25,32 +25,42 @@ void AMainCharacter::Tick(float DeltaTime)
 
 	if (bIsMoving)
 	{
-		CurrentDistance = FVector::Distance(GetActorLocation(), StartLocation);
+		
+
+		//UE_LOG(LogTemp, Warning, TEXT(" Walk:  %f / %f "), CurrentDistance, TotalDistance);
 
 		if (CurrentDistance < TotalDistance)
 		{
-
 			FVector NewLocation = GetActorLocation();
 
 			NewLocation += Direction * Speed * DeltaTime;
 
-			SetActorLocation(NewLocation);
+			SetActorLocation(NewLocation);			
+			
+			//bIsMoving = false;
 
 		}
 		else
 		{
 			//bIsReachTargetLocation = true;
 
+			
+			// Sent event
+			CurrentDistance = 0.0f;
 			bIsMoving = false;
-
 			SetActorLocation(TargetLocation);
 
-			// Launch OnEndMovement event
 			OnEndMovement.Broadcast();
 
-			FRotator newRotation = GetActorRotation() + FRotator(0.0f, 90.0f, 0.0f);
-			SetActorRotation(newRotation);
+			
+
+			
+
+			//FRotator newRotation = GetActorRotation() + FRotator(0.0f, 90.0f, 0.0f);
+			//SetActorRotation(newRotation);
 		}
+
+		CurrentDistance = FVector::Distance(GetActorLocation(), StartLocation);
 
 	}
 }
@@ -64,84 +74,44 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
-void AMainCharacter::WalkPath(TArray<ETILETYPE> TileListToWalk)
-{
-	TileList = TileListToWalk;
-	CurrentTile = 0;
-
-
-}
-
-
-void AMainCharacter::DecideNextTile()
-{
-	if (CurrentTile < TileList.Num())
-	{
-		switch (TileList[CurrentTile])
-		{
-			case ETILETYPE::VE_STRAIGHT:
-
-				// Set target position
-
-			break;
-			case ETILETYPE::VE_TURN_LEFT:
-
-				break;
-			case ETILETYPE::VE_TURN_RIGHT:
-
-				break;
-			case ETILETYPE::VE_END:
-
-				// TODO: VICTORY ANIMATION
-
-			break;
-		}
-	}
-
-
-	// TODO: IF NOT END TILE FOUND, DEFEAT ANIMATION
-}
-
-
-
-void AMainCharacter::MoveToPosition(FVector position)
-{
-	TargetLocation = position;
-	StartLocation = GetActorLocation();
-	TotalDistance = FVector::Distance(StartLocation, TargetLocation);
-
-	Direction = TargetLocation - StartLocation;
-	Direction.Normalize();
-
-	CurrentDistance = 0.0f;
-
-	bIsMoving = true;
-}
 
 
 void AMainCharacter::MoveToDirection(EDIRECTION direction, float distance)
 {
-	FVector CurrentLocation = GetActorLocation();
+	if (bIsMoving) return;
+		 
+	CurrentDistance = 0.0f;
 
-	//yPostion, xPostion
+	StartLocation = GetActorLocation();
+
+	FVector NewLocation = GetActorLocation();
 
 	switch (direction)
 	{
 		case EDIRECTION::VE_UP:
-			CurrentLocation.X += distance;
+			NewLocation.X += distance;
 		break;
 		case EDIRECTION::VE_DOWN:
-			CurrentLocation.X -= distance;
+			NewLocation.X -= distance;
 			break;
 		case EDIRECTION::VE_LEFT:
-			CurrentLocation.Y -= distance;
+			NewLocation.Y -= distance;
 		break;
 		case EDIRECTION::VE_RIGHT:
-			CurrentLocation.Y += distance;
+			NewLocation.Y += distance;
 		break;
 	}
 
-	SetActorLocation(CurrentLocation);
+	TargetLocation = NewLocation;
+
+	TotalDistance = FVector::Distance(StartLocation, TargetLocation);	
+
+	Direction = TargetLocation - StartLocation;
+	Direction.Normalize();
+
+	UE_LOG(LogTemp, Warning, TEXT("About to move: %f / %f"), CurrentDistance, TotalDistance);
+
+	bIsMoving = true;
 }
 
 void AMainCharacter::RotateToDirection(EDIRECTION direction)
@@ -156,7 +126,6 @@ void AMainCharacter::RotateToDirection(EDIRECTION direction)
 	{
 		AddedRotation = FRotator(0.0f, -90.0f, 0.0f);
 	}
-
 	
 	SetActorRotation(GetActorRotation() + AddedRotation);
 }

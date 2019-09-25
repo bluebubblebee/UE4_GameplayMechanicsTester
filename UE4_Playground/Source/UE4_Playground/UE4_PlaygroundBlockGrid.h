@@ -28,10 +28,7 @@ public:
 
 protected:
 
-
-	// Begin AActor interface
 	virtual void BeginPlay() override;
-	// End AActor interface
 
 	UPROPERTY(EditDefaultsOnly, Category = "Grid Settings")
     TSubclassOf<class AUE4_PlaygroundBlock> TileClass;
@@ -79,6 +76,8 @@ public:
 private:
 
 	int32 Score;
+
+	bool bIsInputLocked;
 
 	int32 NumberTileClicked;
 

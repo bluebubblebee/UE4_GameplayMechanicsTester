@@ -37,7 +37,6 @@ AUE4_PlaygroundBlockGrid::AUE4_PlaygroundBlockGrid()
 	TurnRightTilesBitboard = 0;
 	TurnLeftTilesBitboard = 0;
 	StraightTilesBitboard = 0;
-
 }
 
 
@@ -80,7 +79,6 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 	BlockedTilesBitboard = ToggleTile(BlockedTilesBitboard, 7, 5);
 	BlockedTilesBitboard = ToggleTile(BlockedTilesBitboard, 7, 6);
 	BlockedTilesBitboard = ToggleTile(BlockedTilesBitboard, 7, 7);
-
 
 	// Spawn tiles
 	if (TileClass == nullptr) return;
@@ -151,7 +149,9 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 
 	currentTile = ETILETYPE::VE_BASE;
 	currentDirection = EDIRECTION::VE_NONE;
+	bIsInputLocked = false;
 }
+
 
 void AUE4_PlaygroundBlockGrid::HandleClickedOnTile(class AUE4_PlaygroundBlock* Tile)
 {
@@ -164,7 +164,6 @@ void AUE4_PlaygroundBlockGrid::HandleClickedOnTile(class AUE4_PlaygroundBlock* T
 	if ((Tile->GetRow() == EndRow) && (Tile->GetCol() == EndCol)) return;
 
 	if ((Tile->GetRow() == CurrentRowMainChar) && (Tile->GetCol() == CurrentColMainChar)) return;
-
 
 	// Get type tyle clicked
 	ETILETYPE tileType = GetTileType(Tile->GetRow(), Tile->GetCol());
@@ -199,7 +198,6 @@ void AUE4_PlaygroundBlockGrid::HandleClickedOnTile(class AUE4_PlaygroundBlock* T
 		}
 	}
 
-
 	// Get next type of tile and toggle it
 	ETILETYPE nextType = GetNextTileType(tileType);
 	Tile->SetType(nextType);
@@ -221,6 +219,7 @@ void AUE4_PlaygroundBlockGrid::HandleClickedOnTile(class AUE4_PlaygroundBlock* T
 	}
 }
 
+
 void AUE4_PlaygroundBlockGrid::AddScore()
 {
 	// Increment score
@@ -230,175 +229,128 @@ void AUE4_PlaygroundBlockGrid::AddScore()
 	ScoreText->SetText(FText::Format(LOCTEXT("ScoreFmt", "Score: {0}"), FText::AsNumber(Score)));
 }
 
+
+///// MAIN CHARACTER: Path ///////
 void AUE4_PlaygroundBlockGrid::StartAction()
 {
-	if (MainCharacter == nullptr) return;
+	if (bIsInputLocked) return;
 
+	if (MainCharacter == nullptr) return;  	 
 
-	// Create walkable Steps for the character
-	
-	bool reachedExit = false;
+	// Start Path
+	CurrentRowMainChar += 1;
 
+	currentDirection = EDIRECTION::VE_UP;
 
-	bool canWalk = true;
+	currentTile = GetTileType(CurrentRowMainChar, CurrentColMainChar);
 
-	//ETILETYPE currentTile = ETILETYPE::VE_BASE;
-	//EDIRECTION currentDirection = EDIRECTION::VE_NONE;
+	MainCharacter->MoveToDirection(currentDirection, TileSpacing);	
 
+	bIsInputLocked = true;
+}
 
-	//TArray<ETILETYPE> walkableSteps;
+void AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove] - (%d, %d): CurrentTile: %s - lastDirection: %s"), CurrentRowMainChar, CurrentColMainChar, *GetEnumValueAsString<ETILETYPE>("ETILETYPE", currentTile), *GetEnumValueAsString<EDIRECTION>("EDIRECTION", currentDirection));
 
-	//for (int i = 0; i < 30; i++)
-	//{
-		// First time
-		currentTile = GetTileType(CurrentRowMainChar, CurrentColMainChar);
+	EDIRECTION dirCharacter = currentDirection;
 
-		UE_LOG(LogTemp, Warning, TEXT("- (%d, %d): CurrentTile: %s - lastDirection: %s"), CurrentRowMainChar, CurrentColMainChar, *GetEnumValueAsString<ETILETYPE>("ETILETYPE", currentTile), *GetEnumValueAsString<EDIRECTION>("EDIRECTION", currentDirection));
+	if (currentTile == ETILETYPE::VE_STRAIGHT)
+	{
 		
-		if (currentTile == ETILETYPE::VE_START) // Start, move to straight
+
+		if (currentDirection == EDIRECTION::VE_UP)
 		{
 			CurrentRowMainChar += 1;
 
+			dirCharacter = EDIRECTION::VE_UP;
+		}
+		else if (currentDirection == EDIRECTION::VE_DOWN)
+		{
+			CurrentRowMainChar -= 1;
+
+			dirCharacter = EDIRECTION::VE_DOWN;
+		}
+		else if (currentDirection == EDIRECTION::VE_LEFT)
+		{
+			CurrentColMainChar -= 1;
+			dirCharacter = EDIRECTION::VE_LEFT;
+		}
+		else if (currentDirection == EDIRECTION::VE_RIGHT)
+		{
+			CurrentColMainChar += 1;
+			dirCharacter = EDIRECTION::VE_RIGHT;
+		}
+	}
+
+	else if (currentTile == ETILETYPE::VE_TURN_RIGHT)
+	{
+		dirCharacter = EDIRECTION::VE_LEFT;
+
+		// Change direction
+		if (currentDirection == EDIRECTION::VE_UP)
+		{
+			CurrentColMainChar += 1;
+			currentDirection = EDIRECTION::VE_RIGHT;
+
+			dirCharacter = EDIRECTION::VE_RIGHT;
+
+		}
+		else if (currentDirection == EDIRECTION::VE_LEFT)
+		{
+			CurrentRowMainChar += 1;
 			currentDirection = EDIRECTION::VE_UP;
 
-			//MainCharacter->MoveToDirection(EDIRECTION::VE_UP, TileSpacing);
+			dirCharacter = EDIRECTION::VE_UP;
+		}
+		else if (currentDirection == EDIRECTION::VE_RIGHT)
+		{
+			CurrentRowMainChar -= 1;
+			currentDirection = EDIRECTION::VE_DOWN;
+
+			dirCharacter = EDIRECTION::VE_DOWN;
 		}
 
-		else if (currentTile == ETILETYPE::VE_STRAIGHT)
-		{
-			if (currentDirection == EDIRECTION::VE_UP)
-			{
-				CurrentRowMainChar += 1;
-				//MainCharacter->MoveToDirection(EDIRECTION::VE_UP, TileSpacing);
-			}
-			else if (currentDirection == EDIRECTION::VE_DOWN)
-			{
-				CurrentRowMainChar -= 1;
-				//MainCharacter->MoveToDirection(EDIRECTION::VE_DOWN, TileSpacing);
-			}
-			else if (currentDirection == EDIRECTION::VE_LEFT)
-			{
-				CurrentColMainChar -= 1;
-				//MainCharacter->MoveToDirection(EDIRECTION::VE_LEFT, TileSpacing);
-			}
-			else if (currentDirection == EDIRECTION::VE_RIGHT)
-			{
-				CurrentColMainChar += 1;
-				//MainCharacter->MoveToDirection(EDIRECTION::VE_RIGHT, TileSpacing);
-			}
-		}
-
-		else if (currentTile == ETILETYPE::VE_TURN_RIGHT)
-		{
-			// Change direction
-			if (currentDirection == EDIRECTION::VE_UP)
-			{				
-				CurrentColMainChar += 1;
-				currentDirection = EDIRECTION::VE_RIGHT;			
-				
-			}
-			else if (currentDirection == EDIRECTION::VE_LEFT)
-			{
-				CurrentRowMainChar += 1;
-				currentDirection = EDIRECTION::VE_UP;
-			}
-			else if (currentDirection == EDIRECTION::VE_RIGHT)
-			{
-				CurrentRowMainChar -= 1;
-				currentDirection = EDIRECTION::VE_DOWN;
-			}
-
-			MainCharacter->RotateToDirection(EDIRECTION::VE_RIGHT);
-		}
-
-		else if (currentTile == ETILETYPE::VE_TURN_LEFT)
-		{
-			// Change direction
-			if (currentDirection == EDIRECTION::VE_RIGHT)
-			{
-				CurrentRowMainChar += 1;
-				currentDirection = EDIRECTION::VE_UP;
-
-			}
-			else if (currentDirection == EDIRECTION::VE_UP)
-			{
-				CurrentColMainChar -= 1;
-				currentDirection = EDIRECTION::VE_LEFT;
-				
-			}
-
-			MainCharacter->RotateToDirection(EDIRECTION::VE_LEFT);
-
-		}
-
-		/*else if (currentTile == ETILETYPE::VE_END)
-		{
-			UE_LOG(LogTemp, Warning, TEXT(" YAYY!! REACHED THE EXIT - (%d, %d )"), CurrentRowMainChar, CurrentRowMainChar, CurrentColMainChar);
-			reachedExit = true;
-			canWalk = true;
-			//break;
-		}
-
-		else if (currentTile == ETILETYPE::VE_BASE)
-		{
-			UE_LOG(LogTemp, Warning, TEXT(" ERROR: REACHED NON WALKABLE PATH - (%d, %d )"), CurrentRowMainChar, CurrentRowMainChar, CurrentColMainChar);
-			reachedExit = false;
-
-			canWalk = false;
-			//break;
-
-		}*/
-
-		// Check boundaries
-		/*if ((CurrentColMainChar < 0) || (CurrentColMainChar >= Width) || (CurrentRowMainChar < 0) || (CurrentRowMainChar >= Height))
-		{
-			UE_LOG(LogTemp, Warning, TEXT(" ERROR: OUT OF BOUNDARY - (%d, %d)"), CurrentRowMainChar, CurrentColMainChar);
-			reachedExit = false;
-			canWalk = false;
-			//break;
-
-		}*/
-
-		/*if (canWalk)
-		{
-			if (currentTile == ETILETYPE::VE_END)
-			{
-				//UE_LOG(LogTemp, Warning, TEXT(" End!! - (%d, %d )"), CurrentRowMainChar, CurrentRowMainChar, CurrentColMainChar);
-			}
-			else
-			{
-				// Check new tile
-				
-				
-				
-			}
-		}*/
-
-
-	//}
-
-	// Check if the character can move after update the positions
-
-
-	/*if (reachedExit)
-	{
-		//UE_LOG(LogTemp, Warning, TEXT(" REACHED EXIT "));
+		MainCharacter->RotateToDirection(EDIRECTION::VE_RIGHT);
 	}
-	else
+
+	else if (currentTile == ETILETYPE::VE_TURN_LEFT)
 	{
-		UE_LOG(LogTemp, Warning, TEXT(" NOT REACHED EXIT "));
-	}*/
+		dirCharacter = EDIRECTION::VE_LEFT;
+
+		// Change direction
+		if (currentDirection == EDIRECTION::VE_RIGHT)
+		{
+			CurrentRowMainChar += 1;
+			currentDirection = EDIRECTION::VE_UP;
+
+			dirCharacter = EDIRECTION::VE_UP;
+
+		}
+		else if (currentDirection == EDIRECTION::VE_UP)
+		{
+			CurrentColMainChar -= 1;
+			currentDirection = EDIRECTION::VE_LEFT;
+
+			dirCharacter = EDIRECTION::VE_LEFT;
+		}
+
+		MainCharacter->RotateToDirection(EDIRECTION::VE_LEFT);
+	}
 
 
 	ETILETYPE tempTile = GetTileType(CurrentRowMainChar, CurrentColMainChar);
 	if ((tempTile == ETILETYPE::VE_BASE) || (tempTile == ETILETYPE::VE_BLOCKED) || (tempTile == ETILETYPE::VE_BASE))
 	{
-		//UE_LOG(LogTemp, Warning, TEXT(" CANT'T MOVE ANY LONGER "));
+		UE_LOG(LogTemp, Warning, TEXT(" CANT'T MOVE ANY LONGER:  %s "), *GetEnumValueAsString<ETILETYPE>("ETILETYPE", tempTile));
 	}
 	else
 	{
-		//UE_LOG(LogTemp, Warning, TEXT(" ALL GOOD LET'S MOVE "));
-		MainCharacter->MoveToDirection(currentDirection, TileSpacing);
+		//UE_LOG(LogTemp, Warning, TEXT("  "));
+
+		UE_LOG(LogTemp, Warning, TEXT(" Keep going (tempTile):  %s "), *GetEnumValueAsString<ETILETYPE>("ETILETYPE", tempTile));
+
+		MainCharacter->MoveToDirection(dirCharacter, TileSpacing);
 
 		if (tempTile == ETILETYPE::VE_END)
 		{
@@ -406,50 +358,34 @@ void AUE4_PlaygroundBlockGrid::StartAction()
 		}
 	}
 
-
-
-	//float xPostion = CurrentColMainChar * TileSpacing;
-	//float yPostion = CurrentRowMainChar * TileSpacing;
-
-
-	
-
-
-	//const FVector NewPosition = FVector(yPostion, xPostion, 178.0f) + GetActorLocation();
-	
-	//MainCharacter->MoveToPosition(NewPosition);
-
-	//MainCharacter->SetActorLocation(MainPlayerPosition);
-
-
-
 }
-
-void AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove()
-{
-	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove]"));
-
-}
+///// MAIN CHARACTER: Path ///////
 
 
+///// BIT BOARD ///////
 
 //  Toggles 1 bit with XOR Bitwise operation (^)  to a given bitboard, in a ceratan row and column
 int64_t AUE4_PlaygroundBlockGrid::ToggleTile(const int64_t& bitBoard, const int32& row, const int32& column)
 {
 	// Set the bit in the correct position for the bitboard 
 	// toggle the attribute value on and off (XOR, exclusive or)
-	 /*a | b | a ^ b
-							--|---|------
-							0 | 0 | 0
-							0 | 1 | 1
-							1 | 0 | 1
-							1 | 1 | 0*/
+	 /*   
+	      a | b | a ^ b
+		  --|---|------
+		  0 | 0 |  0
+		  0 | 1 |  1
+		  1 | 0 |  1
+		  1 | 1 |  0
+
+	*/
+
 	int64_t newBit = 1LL << (row * Width + column);
 
 	newBit ^= bitBoard;
 
 	return (newBit);
 }
+
 
 // Returns the state of a specific row and column in a bitboard
 bool AUE4_PlaygroundBlockGrid::GetTileState(const int64_t& bitBoard, const int32& row, const int32& column) const
@@ -474,7 +410,6 @@ ETILETYPE AUE4_PlaygroundBlockGrid::GetTileType(const int32 row, const int32 col
 	{
 		return ETILETYPE::VE_TURN_LEFT;
 	}
-	
 
 	else if (GetTileState(StraightTilesBitboard, row, column))
 	{

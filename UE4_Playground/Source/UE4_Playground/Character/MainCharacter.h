@@ -53,18 +53,7 @@ public:
 
 	FEndOfMoveDelegate OnEndMovement;
 
-	void MoveToPosition(FVector position);
-
 	void MoveToDirection(EDIRECTION direction, float distance);
 
 	void RotateToDirection(EDIRECTION direction);
-
-	void WalkPath(TArray<ETILETYPE> TileListToWalk);
-
-	TArray<ETILETYPE> TileList;
-
-	int32 CurrentTile;
-
-	void DecideNextTile();
-
 };
