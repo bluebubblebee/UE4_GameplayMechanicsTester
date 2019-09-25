@@ -8,8 +8,6 @@
 
 #define LOCTEXT_NAMESPACE "PuzzleBlockGrid"
 
-
-
 AUE4_PlaygroundBlockGrid::AUE4_PlaygroundBlockGrid()
 {
 	// Create dummy root scene component
@@ -83,15 +81,9 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 	BlockedTilesBitboard = ToggleTile(BlockedTilesBitboard, 7, 6);
 	BlockedTilesBitboard = ToggleTile(BlockedTilesBitboard, 7, 7);
 
-	//UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundBlockGrid::BlocksBitboard %lu"), BlocksBitboard);
 
-	//GridBitboard = 0x0000000000000000000000000000000000000000000000000000000000000000;
-
-	//UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundBlockGrid::GridBitboard %lu"), GridBitboard);
-
-
+	// Spawn tiles
 	if (TileClass == nullptr) return;
-
 	
 	CurrentRowMainChar = StartRow;
 	CurrentColMainChar = StartCol;
@@ -124,8 +116,6 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 				// Check if it's a block
 				if (GetTileState(BlockedTilesBitboard, row, col))
 				{
-					UE_LOG(LogTemp, Warning, TEXT("GetTileState it's a block %d , %d"), row, col);
-
 					NewTile->SetType(ETILETYPE::VE_BLOCKED);
 				}
 			}
@@ -160,21 +150,19 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 	}
 }
 
-void AUE4_PlaygroundBlockGrid::HandleClickedOnBlock(class AUE4_PlaygroundBlock* Block)
+void AUE4_PlaygroundBlockGrid::HandleClickedOnTile(class AUE4_PlaygroundBlock* Tile)
 {
 	// Prevent from clicking on Start,EndRow and where the character is
-	if ((Block->GetRow() == StartRow) && (Block->GetCol() == StartCol)) return;
+	if ((Tile->GetRow() == StartRow) && (Tile->GetCol() == StartCol)) return;
 
-	if ((Block->GetRow() == EndRow) && (Block->GetCol() == EndCol)) return;
+	if ((Tile->GetRow() == EndRow) && (Tile->GetCol() == EndCol)) return;
 
-	if ((Block->GetRow() == CurrentRowMainChar) && (Block->GetCol() == CurrentColMainChar)) return;
+	if ((Tile->GetRow() == CurrentRowMainChar) && (Tile->GetCol() == CurrentColMainChar)) return;
 
 
 	// Get type tyle clicked
-	ETILETYPE tileType = GetTileType(Block->GetRow(), Block->GetCol());
+	ETILETYPE tileType = GetTileType(Tile->GetRow(), Tile->GetCol());
 
-	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] %s - %s "), *Block->GetActorLabel(), *GetEnumValueAsString<ETILETYPE>("ETILETYPE", tileType));
-	
 	// Prevent from clicking on Blocked tiles
 	if (tileType == ETILETYPE::VE_BLOCKED) return;
 
@@ -189,22 +177,17 @@ void AUE4_PlaygroundBlockGrid::HandleClickedOnBlock(class AUE4_PlaygroundBlock* 
 		switch (tileType)
 		{
 		case ETILETYPE::VE_TURN_RIGHT:
-			UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Remove: TurnRight "));
-			TurnRightTilesBitboard = ToggleTile(TurnRightTilesBitboard, Block->GetRow(), Block->GetCol());
+			TurnRightTilesBitboard = ToggleTile(TurnRightTilesBitboard, Tile->GetRow(), Tile->GetCol());
 
 			break;
 		case ETILETYPE::VE_TURN_LEFT:
 			
-			TurnLeftTilesBitboard = ToggleTile(TurnLeftTilesBitboard, Block->GetRow(), Block->GetCol());
-
-			UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Remove: TurnLeft - "));
+			TurnLeftTilesBitboard = ToggleTile(TurnLeftTilesBitboard, Tile->GetRow(), Tile->GetCol());
 
 			break;
 		case ETILETYPE::VE_STRAIGHT:
 			
-			StraightTilesBitboard = ToggleTile(StraightTilesBitboard, Block->GetRow(), Block->GetCol());
-
-			UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Remove: Straight: "));			
+			StraightTilesBitboard = ToggleTile(StraightTilesBitboard, Tile->GetRow(), Tile->GetCol());
 
 			break;
 		}
@@ -213,33 +196,23 @@ void AUE4_PlaygroundBlockGrid::HandleClickedOnBlock(class AUE4_PlaygroundBlock* 
 
 	// Get next type of tile and toggle it
 	ETILETYPE nextType = GetNextTileType(tileType);
-	Block->SetType(nextType);
-
-	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] nextType: %s "), *GetEnumValueAsString<ETILETYPE>("ETILETYPE", nextType));
+	Tile->SetType(nextType);
 
 	switch (nextType)
 	{
 	case ETILETYPE::VE_TURN_RIGHT:
-		UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Add: TurnRight "));
-		TurnRightTilesBitboard = ToggleTile(TurnRightTilesBitboard, Block->GetRow(), Block->GetCol());
+		TurnRightTilesBitboard = ToggleTile(TurnRightTilesBitboard, Tile->GetRow(), Tile->GetCol());
 		break;
 
 		case ETILETYPE::VE_TURN_LEFT:
-		UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Add: TurnLeft "));
-		TurnLeftTilesBitboard = ToggleTile(TurnLeftTilesBitboard, Block->GetRow(), Block->GetCol());
+		TurnLeftTilesBitboard = ToggleTile(TurnLeftTilesBitboard, Tile->GetRow(), Tile->GetCol());
 		break;
 
 	case ETILETYPE::VE_STRAIGHT:
-		UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::StartAction] Add: Straight "));
-		StraightTilesBitboard = ToggleTile(StraightTilesBitboard, Block->GetRow(), Block->GetCol());
+		StraightTilesBitboard = ToggleTile(StraightTilesBitboard, Tile->GetRow(), Tile->GetCol());
 		break;
 
 	}
-}
-
-
-void AUE4_PlaygroundBlockGrid::SetBlockClicked(class AUE4_PlaygroundBlock* Block)
-{
 }
 
 void AUE4_PlaygroundBlockGrid::AddScore()
@@ -317,61 +290,36 @@ int64_t AUE4_PlaygroundBlockGrid::ToggleTile(const int64_t& bitBoard, const int3
 // Returns the state of a specific row and column in a bitboard
 bool AUE4_PlaygroundBlockGrid::GetTileState(const int64_t& bitBoard, const int32& row, const int32& column) const
 {
-	//UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundBlockGrid::GetTileState %ld - ( %d , %d )"), bitBoard, row, column);
 	int64_t mask = 1LL << (row * Width + column);
 
 	return ((mask & bitBoard) != 0);
 }
 
-/*
-FString AUE4_PlaygroundBlockGrid::BitsToString(const int64_t& bitBoard)
-{
-	FString Bits;
-	Bits.Reserve(FMath::FloorToInt(FMath::Sqrt(bitBoard))); //Reserveing space for string in memory FString won't rellocate string multiple times in process
-	//We multiply by 2 until it's bigger then n where every bit will be 0 after that
-	for (int i = 1; i < bitBoard; (i * 2))
-	{
-		if (bitBoard & i) Bits.Append("1");
-		else Bits.Append("0");
-	}
-
-	return Bits.Reverse(); //We need to reverse bit order, so smallest is last
-}*/
-
-
 ETILETYPE AUE4_PlaygroundBlockGrid::GetTileType(const int32 row, const int32 column)
 {
-	//ETILETYPE tile = ETILETYPE::VE_BASE;
-
 	if ((row == StartRow) && (column == StartCol)) return ETILETYPE::VE_START;
 
 	if ((row == EndRow) && (column == EndCol)) return ETILETYPE::VE_END;
 
 	if (GetTileState(BlockedTilesBitboard, row, column))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[GetTileType.BlocksBitboard]  "));
 		return ETILETYPE::VE_BLOCKED;
 	}
 	
 	if (GetTileState(TurnLeftTilesBitboard, row, column))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[GetTileType.TurnLeft]  "));
 		return ETILETYPE::VE_TURN_LEFT;
 	}
 	
 
 	else if (GetTileState(StraightTilesBitboard, row, column))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[GetTileType.Staright]  "));
-		return ETILETYPE::VE_STRAIGHT;
-		
+		return ETILETYPE::VE_STRAIGHT;		
 	}
 
 	else if (GetTileState(TurnRightTilesBitboard, row, column))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[GetTileType.TurnRight]  "));
-		return ETILETYPE::VE_TURN_RIGHT;
-		
+		return ETILETYPE::VE_TURN_RIGHT;		
 	}
 
 	return ETILETYPE::VE_BASE;

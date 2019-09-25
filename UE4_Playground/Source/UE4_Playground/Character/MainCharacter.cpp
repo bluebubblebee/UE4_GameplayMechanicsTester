@@ -90,11 +90,11 @@ void AMainCharacter::DecideNextTile()
 			case ETILETYPE::VE_TURN_RIGHT:
 
 				break;
-				case ETILETYPE::VE_END:
+			case ETILETYPE::VE_END:
 
 				// TODO: VICTORY ANIMATION
 
-				break;
+			break;
 		}
 	}
 

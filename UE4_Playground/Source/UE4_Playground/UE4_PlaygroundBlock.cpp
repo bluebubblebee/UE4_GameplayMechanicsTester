@@ -82,19 +82,15 @@ void AUE4_PlaygroundBlock::OnFingerPressedBlock(ETouchIndex::Type FingerIndex, U
 void AUE4_PlaygroundBlock::HandleClicked()
 {
 
-	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlock::HandleClicked]"));
-
 	if (OwningGrid != nullptr)
 	{
-		OwningGrid->HandleClickedOnBlock(this);
+		OwningGrid->HandleClickedOnTile(this);
 	}
 }
 
 
 void AUE4_PlaygroundBlock::SetType(ETILETYPE type)
 {
-	//Type = type;
-
 	switch (type)
 	{
 	case ETILETYPE::VE_BLOCKED:
