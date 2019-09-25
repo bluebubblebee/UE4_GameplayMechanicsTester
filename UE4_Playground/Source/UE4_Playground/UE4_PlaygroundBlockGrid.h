@@ -97,18 +97,22 @@ private:
 
 	///// MAIN CHARACTER ///////
 
+	///// MAIN CHARACTER: Path ///////
+	ETILETYPE currentTile;
+	EDIRECTION currentDirection;
+	///// MAIN CHARACTER: Path ///////
+
 private:
+
+
+
 	///// BIT BOARD ///////
-
-	
-
 	// Grid Representation as long long int, 64 bits.
 	// Each int64_t represents a tile type
 	int64_t BlockedTilesBitboard;
 	int64_t StraightTilesBitboard;
 	int64_t TurnLeftTilesBitboard;
 	int64_t TurnRightTilesBitboard;
-
 	
 	int64_t ToggleTile(const int64_t& bitBoard, const int32& row, const int32& column);
 

@@ -18,6 +18,16 @@ enum class ETILETYPE : uint8
 	VE_END       UMETA(DisplayName = "End"),
 };
 
+UENUM(BlueprintType)
+enum class EDIRECTION : uint8
+{
+	VE_NONE 	UMETA(DisplayName = "None"),
+	VE_UP 	UMETA(DisplayName = "Up"),
+	VE_RIGHT		UMETA(DisplayName = "Right"),
+	VE_DOWN		UMETA(DisplayName = "Down"),
+	VE_LEFT		UMETA(DisplayName = "Left")
+};
+
 
 
 template<typename TEnum>

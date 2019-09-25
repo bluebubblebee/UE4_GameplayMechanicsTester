@@ -55,6 +55,10 @@ public:
 
 	void MoveToPosition(FVector position);
 
+	void MoveToDirection(EDIRECTION direction, float distance);
+
+	void RotateToDirection(EDIRECTION direction);
+
 	void WalkPath(TArray<ETILETYPE> TileListToWalk);
 
 	TArray<ETILETYPE> TileList;

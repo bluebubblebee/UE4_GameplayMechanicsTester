@@ -118,3 +118,46 @@ void AMainCharacter::MoveToPosition(FVector position)
 	bIsMoving = true;
 }
 
+
+void AMainCharacter::MoveToDirection(EDIRECTION direction, float distance)
+{
+	FVector CurrentLocation = GetActorLocation();
+
+	//yPostion, xPostion
+
+	switch (direction)
+	{
+		case EDIRECTION::VE_UP:
+			CurrentLocation.X += distance;
+		break;
+		case EDIRECTION::VE_DOWN:
+			CurrentLocation.X -= distance;
+			break;
+		case EDIRECTION::VE_LEFT:
+			CurrentLocation.Y -= distance;
+		break;
+		case EDIRECTION::VE_RIGHT:
+			CurrentLocation.Y += distance;
+		break;
+	}
+
+	SetActorLocation(CurrentLocation);
+}
+
+void AMainCharacter::RotateToDirection(EDIRECTION direction)
+{
+	FRotator AddedRotation = FRotator(0.0f, 0.0f, 0.0f);;
+
+	if (direction == EDIRECTION::VE_RIGHT)
+	{
+		AddedRotation = FRotator(0.0f, 90.0f, 0.0f);
+	}
+	else if (direction == EDIRECTION::VE_LEFT)
+	{
+		AddedRotation = FRotator(0.0f, -90.0f, 0.0f);
+	}
+
+	
+	SetActorRotation(GetActorRotation() + AddedRotation);
+}
+
