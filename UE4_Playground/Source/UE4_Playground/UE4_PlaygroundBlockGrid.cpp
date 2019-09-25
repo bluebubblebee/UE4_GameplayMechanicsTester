@@ -47,7 +47,7 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 
 	// Set the blocks
 	
-	/*BlockedTilesBitboard = ToggleTile(BlockedTilesBitboard, 0, 0);
+	BlockedTilesBitboard = ToggleTile(BlockedTilesBitboard, 0, 0);
 	BlockedTilesBitboard = ToggleTile(BlockedTilesBitboard, 0, 2);
 	BlockedTilesBitboard = ToggleTile(BlockedTilesBitboard, 0, 4);
 	BlockedTilesBitboard = ToggleTile(BlockedTilesBitboard, 0, 5);
@@ -79,7 +79,7 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 	BlockedTilesBitboard = ToggleTile(BlockedTilesBitboard, 7, 3);
 	BlockedTilesBitboard = ToggleTile(BlockedTilesBitboard, 7, 5);
 	BlockedTilesBitboard = ToggleTile(BlockedTilesBitboard, 7, 6);
-	BlockedTilesBitboard = ToggleTile(BlockedTilesBitboard, 7, 7);*/
+	BlockedTilesBitboard = ToggleTile(BlockedTilesBitboard, 7, 7);
 
 
 	// Spawn tiles
@@ -331,7 +331,7 @@ void AUE4_PlaygroundBlockGrid::StartAction()
 
 		}
 
-		else if (currentTile == ETILETYPE::VE_END)
+		/*else if (currentTile == ETILETYPE::VE_END)
 		{
 			UE_LOG(LogTemp, Warning, TEXT(" YAYY!! REACHED THE EXIT - (%d, %d )"), CurrentRowMainChar, CurrentRowMainChar, CurrentColMainChar);
 			reachedExit = true;
@@ -347,19 +347,19 @@ void AUE4_PlaygroundBlockGrid::StartAction()
 			canWalk = false;
 			//break;
 
-		}
+		}*/
 
 		// Check boundaries
-		if ((CurrentColMainChar < 0) || (CurrentColMainChar >= Width) || (CurrentRowMainChar < 0) || (CurrentRowMainChar >= Height))
+		/*if ((CurrentColMainChar < 0) || (CurrentColMainChar >= Width) || (CurrentRowMainChar < 0) || (CurrentRowMainChar >= Height))
 		{
 			UE_LOG(LogTemp, Warning, TEXT(" ERROR: OUT OF BOUNDARY - (%d, %d)"), CurrentRowMainChar, CurrentColMainChar);
 			reachedExit = false;
 			canWalk = false;
 			//break;
 
-		}
+		}*/
 
-		if (canWalk)
+		/*if (canWalk)
 		{
 			if (currentTile == ETILETYPE::VE_END)
 			{
@@ -372,117 +372,40 @@ void AUE4_PlaygroundBlockGrid::StartAction()
 				
 				
 			}
-		}
+		}*/
 
 
 	//}
 
-	if (reachedExit)
+	// Check if the character can move after update the positions
+
+
+	/*if (reachedExit)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT(" REACHED EXIT "));
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT(" NOT REACHED EXIT "));
-	}
-
-	bool outOFBoundaries = ((CurrentColMainChar < 0) || (CurrentColMainChar >= Width) || (CurrentRowMainChar < 0) || (CurrentRowMainChar >= Height));
+	}*/
 
 
-	//ETILETYPE nextTile = GetTileType(CurrentRowMainChar, CurrentColMainChar);
-	if ((currentTile == ETILETYPE::VE_BASE) || (currentTile == ETILETYPE::VE_BLOCKED) || (currentTile == ETILETYPE::VE_BASE) || outOFBoundaries)
+	ETILETYPE tempTile = GetTileType(CurrentRowMainChar, CurrentColMainChar);
+	if ((tempTile == ETILETYPE::VE_BASE) || (tempTile == ETILETYPE::VE_BLOCKED) || (tempTile == ETILETYPE::VE_BASE))
 	{
-		UE_LOG(LogTemp, Warning, TEXT(" CANT'T MOVE ANY LONGER "));
+		//UE_LOG(LogTemp, Warning, TEXT(" CANT'T MOVE ANY LONGER "));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT(" Moving! "));
-
+		//UE_LOG(LogTemp, Warning, TEXT(" ALL GOOD LET'S MOVE "));
 		MainCharacter->MoveToDirection(currentDirection, TileSpacing);
-	}
-	
 
-
-	// First always add 1 row
-	//CurrentRowMainChar += 1;
-
-
-
-	// Get next one	
-	/*for (int i = 0; i < 5; i++)
-	{
-		//while ((currentTile != ETILETYPE::VE_BASE) || (currentTile != ETILETYPE::VE_END) || (currentTile != ETILETYPE::VE_BLOCKED))
-		//nextTile = GetTileType(CurrentRowMainChar, CurrentColMainChar);
-
-		
-
-		//walkableSteps.Add(currentTile);
-
-		// Check type and check row, col 
-		switch (nextTile)
+		if (tempTile == ETILETYPE::VE_END)
 		{
-		case ETILETYPE::VE_STRAIGHT:
-			CurrentRowMainChar += 1;
-			walkableSteps.Add(ETILETYPE::VE_STRAIGHT);
-			break;
-
-
-		case ETILETYPE::VE_TURN_RIGHT:
-			CurrentColMainChar += 1;
-
-			// Check out of boundaries
-			if (CurrentColMainChar >= Width)
-			{
-				// Out of boundaries
-				walkableSteps.Add(ETILETYPE::VE_BASE);
-			}
-			else
-			{
-				// Keep walking
-				walkableSteps.Add(ETILETYPE::VE_STRAIGHT);
-				walkableSteps.Add(ETILETYPE::VE_TURN_RIGHT);
-			}
-
-			break;
-
-		case ETILETYPE::VE_TURN_LEFT:
-			CurrentColMainChar -= 1;
-
-			// Check out of boundaries
-			if (CurrentColMainChar < 0)
-			{
-				// Out of boundaries
-				walkableSteps.Add(ETILETYPE::VE_BASE);
-			}
-			else
-			{
-				// Keep walking
-				walkableSteps.Add(ETILETYPE::VE_STRAIGHT);
-				walkableSteps.Add(ETILETYPE::VE_TURN_LEFT);
-			}
-			break;
-
-		case ETILETYPE::VE_BASE:
-
-			walkableSteps.Add(ETILETYPE::VE_BASE);
-
-			break;
-
-		case ETILETYPE::VE_BLOCKED:
-
-			walkableSteps.Add(ETILETYPE::VE_BLOCKED);
-
-			break;
-
-		case ETILETYPE::VE_END:
-
-			// Keep walking
-			walkableSteps.Add(ETILETYPE::VE_STRAIGHT);
-			walkableSteps.Add(ETILETYPE::VE_END);
-
-			break;
+			UE_LOG(LogTemp, Warning, TEXT(" REACHED END!! "));
 		}
-	}*/
+	}
+
 
 
 	//float xPostion = CurrentColMainChar * TileSpacing;
