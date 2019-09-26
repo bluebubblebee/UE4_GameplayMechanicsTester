@@ -168,15 +168,12 @@ void AUE4_PlaygroundBlockGrid::Tick(float DeltaTime)
 	{
 		waitDeltaTime += DeltaTime;
 
-		if (waitDeltaTime >= 1.0f)
+		if (waitDeltaTime >= 0.3f)
 		{
-
 			waitDeltaTime = 0.0f;
 			bWaitForNextMove = false;
 
-			MoveToNextTile();
-
-			
+			MoveToNextTile();			
 		}
 	}
 }
@@ -266,15 +263,10 @@ void AUE4_PlaygroundBlockGrid::MoveToNextTile()
 
 	if (currentTile == ETILETYPE::VE_START)
 	{
-
 		// Start Path
 		CurrentRowMainChar += 1;
 
 		currentDirection = EDIRECTION::VE_UP;
-
-
-
-		//MainCharacter->MoveToDirection(currentDirection, TileSpacing);
 	}
 
 	if (currentTile == ETILETYPE::VE_STRAIGHT)
@@ -299,14 +291,11 @@ void AUE4_PlaygroundBlockGrid::MoveToNextTile()
 
 	else if (currentTile == ETILETYPE::VE_TURN_RIGHT)
 	{
-
 		// Change direction
 		if (currentDirection == EDIRECTION::VE_UP)
 		{
 			CurrentColMainChar += 1;
 			currentDirection = EDIRECTION::VE_RIGHT;
-
-
 
 		}
 		else if (currentDirection == EDIRECTION::VE_LEFT)
@@ -320,8 +309,6 @@ void AUE4_PlaygroundBlockGrid::MoveToNextTile()
 		{
 			CurrentRowMainChar -= 1;
 			currentDirection = EDIRECTION::VE_DOWN;
-
-
 		}
 
 		MainCharacter->RotateToDirection(EDIRECTION::VE_RIGHT);
@@ -346,31 +333,54 @@ void AUE4_PlaygroundBlockGrid::MoveToNextTile()
 		MainCharacter->RotateToDirection(EDIRECTION::VE_LEFT);
 	}
 
+	bool CanContinue = true;
 
+	bool OutOfBoundaries = ((CurrentRowMainChar < 0) || (CurrentColMainChar < 0) || (CurrentRowMainChar >= Height) || (CurrentColMainChar >= Width));
+
+	if (OutOfBoundaries)
+	{
+		CanContinue = false;
+		//UE_LOG(LogTemp, Warning, TEXT("OutOfBoundaries CANT'T MOVE ANY LONGER:"));
+	}
+
+	// Check next tile
 	ETILETYPE tempTile = GetTileType(CurrentRowMainChar, CurrentColMainChar);
 	if ((tempTile == ETILETYPE::VE_BASE) || (tempTile == ETILETYPE::VE_BLOCKED) || (tempTile == ETILETYPE::VE_BASE))
 	{
-		UE_LOG(LogTemp, Warning, TEXT(" CANT'T MOVE ANY LONGER:  %s "), *GetEnumValueAsString<ETILETYPE>("ETILETYPE", tempTile));
+		CanContinue = false;
+		//UE_LOG(LogTemp, Warning, TEXT(" CANT'T MOVE ANY LONGER:  %s "), *GetEnumValueAsString<ETILETYPE>("ETILETYPE", tempTile));
 	}
+	   	
+
 	else
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("  "));
 
-		UE_LOG(LogTemp, Warning, TEXT(" Keep going (tempTile):  %s "), *GetEnumValueAsString<ETILETYPE>("ETILETYPE", tempTile));
+		//UE_LOG(LogTemp, Warning, TEXT(" Keep going (tempTile):  %s "), *GetEnumValueAsString<ETILETYPE>("ETILETYPE", tempTile));
 
-		MainCharacter->MoveToDirection(currentDirection, TileSpacing);
-
-		
-
-		if (tempTile == ETILETYPE::VE_END)
+		if (currentTile == ETILETYPE::VE_END)
 		{
+			CanContinue = false;
+
 			UE_LOG(LogTemp, Warning, TEXT(" REACHED END!! "));
+		}
+		else
+		{
+			MainCharacter->MoveToDirection(currentDirection, TileSpacing);
 		}
 	}
 
+	if (CanContinue)
+	{
+		
 
-	bWaitForNextMove = true;
-	waitDeltaTime = 0.0f;
+		bWaitForNextMove = true;
+		waitDeltaTime = 0.0f;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT(" NO PATH FOR ME "));
+	}
 
 
 }

@@ -31,7 +31,7 @@ AUE4_PlaygroundBlock::AUE4_PlaygroundBlock()
 			, MTurnRight(TEXT("/Game/Art/Tiles/MI_TurnRight.MI_TurnRight"))
 			, MStraight(TEXT("/Game/Art/Tiles/MI_Straight.MI_Straight"))
 			, MBlock(TEXT("/Game/Art/Tiles/MI_Block.MI_Block"))
-			, MStart(TEXT("/Game/Art/Tiles/MI_Start.MI_Start"))
+			, MStart(TEXT("/Game/Art/Tiles/MI_Start.MI_Start")) 
 			, MExit(TEXT("/Game/Art/Tiles/MI_Exit.MI_Exit"))
 			
 
