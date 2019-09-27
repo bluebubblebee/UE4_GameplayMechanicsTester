@@ -68,8 +68,13 @@ public:
 
 private:
 
-	int32 Score;
-	
+	FTimerHandle StartGameTimerHandle;
+	UFUNCTION()
+	void OnStartGame();
+
+
+
+
 	bool bIsInputLocked;
 
 	int32 NumberTileClicked;
@@ -97,12 +102,11 @@ private:
 
 	///// MAIN CHARACTER: Path ///////
 	ETILETYPE currentTile;
+
 	EDIRECTION currentDirection;
 	///// MAIN CHARACTER: Path ///////
 
 private:
-
-
 
 	///// BIT BOARD ///////
 	// Grid Representation as long long int, 64 bits.

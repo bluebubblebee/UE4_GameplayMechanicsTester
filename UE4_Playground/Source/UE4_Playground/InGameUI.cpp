@@ -3,6 +3,8 @@
 
 #include "InGameUI.h"
 #include "Components/TextBlock.h"
+#include "Components/SizeBox.h"
+#include "Components/Image.h"
 
 bool UInGameUI::Initialize()
 {
@@ -15,9 +17,35 @@ bool UInGameUI::Initialize()
 	return true;
 }
 
+void UInGameUI::ShowMessages()
+{
+	if (InGameBox != nullptr)
+	{
+		InGameBox->SetVisibility(ESlateVisibility::Visible);
+	}
+
+	if (BackgroundMessages != nullptr)
+	{
+		BackgroundMessages->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void UInGameUI::HideMessages()
+{
+	if(InGameBox != nullptr)
+	{
+		InGameBox->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	if (BackgroundMessages != nullptr)
+	{
+		BackgroundMessages->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
 void UInGameUI::UpdateInGameMessage(const FString& Text)
 {
 	if (InGameMessages == nullptr) return;
 
-	InGameMessages->SetText(FText::FromString(Text));
+	InGameMessages->SetText(FText::FromString(Text)); 
 }

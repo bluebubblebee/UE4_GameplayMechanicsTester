@@ -4,10 +4,10 @@
 #include "UE4_PlaygroundBlock.h"
 #include "Components/TextRenderComponent.h"
 #include "Engine/World.h"
-
+#include "Character/MainCharacter.h"
+#include "UE4_PlaygroundPlayerController.h"
 #include "InGameUI.h"
 
-#include "Character/MainCharacter.h"
 
 #define LOCTEXT_NAMESPACE "PuzzleBlockGrid"
 
@@ -149,8 +149,27 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 
 	currentTile = ETILETYPE::VE_BASE;
 	currentDirection = EDIRECTION::VE_NONE;
-	bIsInputLocked = false;
+	bIsInputLocked = true;
 	bWaitForNextMove = false;
+
+	
+
+	GetWorld()->GetTimerManager().SetTimer(StartGameTimerHandle, this, &AUE4_PlaygroundBlockGrid::OnStartGame, 10.0f);
+}
+
+void AUE4_PlaygroundBlockGrid::OnStartGame()
+{
+	GetWorld()->GetTimerManager().ClearTimer(StartGameTimerHandle);
+
+	// Hide UI
+	AUE4_PlaygroundPlayerController* PC = Cast<AUE4_PlaygroundPlayerController>(GetWorld()->GetFirstPlayerController());
+
+	if ((PC != nullptr) && (PC->GetInGameUI() != nullptr))
+	{
+		PC->GetInGameUI()->HideMessages();
+	}
+
+	bIsInputLocked = false;
 }
 
 
@@ -177,6 +196,16 @@ void AUE4_PlaygroundBlockGrid::Tick(float DeltaTime)
 
 void AUE4_PlaygroundBlockGrid::HandleClickedOnTile(class AUE4_PlaygroundBlock* Tile)
 {
+	if (bIsInputLocked) return;
+
+	AUE4_PlaygroundPlayerController* PC = Cast<AUE4_PlaygroundPlayerController>(GetWorld()->GetFirstPlayerController());
+
+	if ((PC != nullptr) && (PC->GetInGameUI() != nullptr))
+	{
+		PC->GetInGameUI()->UpdateInGameMessage("HandleClickedOnTile.Testing UI");
+	}
+
+
 	// If max block clicked return
 	if (NumberTileClicked >= MaximunTileClicks) return;
 

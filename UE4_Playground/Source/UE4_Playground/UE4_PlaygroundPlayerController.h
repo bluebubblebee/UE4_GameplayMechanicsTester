@@ -24,6 +24,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = "UI")
 	class UInGameUI* InGameUI;
 
+public:
+	FORCEINLINE class UInGameUI* GetInGameUI() const { return InGameUI; }
+
 protected:
 
 	virtual void BeginPlay() override;

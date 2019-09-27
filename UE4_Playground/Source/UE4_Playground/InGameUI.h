@@ -22,7 +22,17 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* InGameMessages;
 
+	UPROPERTY(meta = (BindWidget))
+	class UImage* BackgroundMessages;
+
+	UPROPERTY(meta = (BindWidget))
+	class USizeBox* InGameBox;
+
 public:
+
+	void ShowMessages();
+
+	void HideMessages();
 
 	void UpdateInGameMessage(const FString& Text);
 	

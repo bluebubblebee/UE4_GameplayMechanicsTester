@@ -33,6 +33,8 @@ void AUE4_PlaygroundPlayerController::BeginPlay()
 		if (InGameUI != nullptr)
 		{
 			InGameUI->AddToViewport();
+
+			InGameUI->UpdateInGameMessage("CLICK ON THE TILES TO CHANGE THEM. WHEN READY, PRESS THE PLAY BUTTON TO MAKE TAICHI FOLLOW THE PATH");
 		}
 	}
 }
