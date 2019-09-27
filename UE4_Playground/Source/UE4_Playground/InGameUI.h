@@ -13,5 +13,17 @@ UCLASS()
 class UE4_PLAYGROUND_API UInGameUI : public UUserWidget
 {
 	GENERATED_BODY()
+
+private:
+	virtual bool Initialize() override;
+
+protected:
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* InGameMessages;
+
+public:
+
+	void UpdateInGameMessage(const FString& Text);
 	
 };
