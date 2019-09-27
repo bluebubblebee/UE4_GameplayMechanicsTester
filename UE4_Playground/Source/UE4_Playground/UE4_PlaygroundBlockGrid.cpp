@@ -4,6 +4,9 @@
 #include "UE4_PlaygroundBlock.h"
 #include "Components/TextRenderComponent.h"
 #include "Engine/World.h"
+
+#include "InGameUI.h"
+
 #include "Character/MainCharacter.h"
 
 #define LOCTEXT_NAMESPACE "PuzzleBlockGrid"
@@ -13,13 +16,6 @@ AUE4_PlaygroundBlockGrid::AUE4_PlaygroundBlockGrid()
 	// Create dummy root scene component
 	DummyRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Dummy0"));
 	RootComponent = DummyRoot;
-
-	// Create static mesh component
-	ScoreText = CreateDefaultSubobject<UTextRenderComponent>(TEXT("ScoreText0"));
-	ScoreText->SetRelativeLocation(FVector(200.f,0.f,0.f));
-	ScoreText->SetRelativeRotation(FRotator(90.f,0.f,0.f));
-	ScoreText->SetText(FText::Format(LOCTEXT("ScoreFmt", "Score: {0}"), FText::AsNumber(0)));
-	ScoreText->SetupAttachment(DummyRoot);
 
 	MaximunTileClicks = 10;
 	TileSpacing = 265.0f;
@@ -246,14 +242,6 @@ void AUE4_PlaygroundBlockGrid::HandleClickedOnTile(class AUE4_PlaygroundBlock* T
 }
 
 
-void AUE4_PlaygroundBlockGrid::AddScore()
-{
-	// Increment score
-	Score++;
-
-	// Update text
-	ScoreText->SetText(FText::Format(LOCTEXT("ScoreFmt", "Score: {0}"), FText::AsNumber(Score)));
-}
 
 
 void AUE4_PlaygroundBlockGrid::MoveToNextTile()

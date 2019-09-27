@@ -18,10 +18,6 @@ class AUE4_PlaygroundBlockGrid : public AActor
 	UPROPERTY(Category = Grid, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class USceneComponent* DummyRoot;
 
-	/** Text component for the score */
-	UPROPERTY(Category = Grid, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UTextRenderComponent* ScoreText;
-
 public:
 
 	AUE4_PlaygroundBlockGrid();
@@ -63,16 +59,11 @@ protected:
 
 public:
 
-	/** Handle the block being clicked */
-	void AddScore();
-
 	void StartAction();
 
 	void HandleClickedOnTile(class AUE4_PlaygroundBlock* Tile);
 
 	FORCEINLINE class USceneComponent* GetDummyRoot() const { return DummyRoot; }
-
-	FORCEINLINE class UTextRenderComponent* GetScoreText() const { return ScoreText; }
 
 
 private:

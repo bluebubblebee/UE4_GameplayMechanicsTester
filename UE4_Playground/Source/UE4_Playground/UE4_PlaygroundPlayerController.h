@@ -14,6 +14,19 @@ class AUE4_PlaygroundPlayerController : public APlayerController
 
 public:
 	AUE4_PlaygroundPlayerController();
+
+
+protected:
+	// Dynamic reference to the blueprint class
+	TSubclassOf<class UUserWidget> InGameUIClass;
+
+	// Internal reference to the blueprint for gameplay logic
+	UPROPERTY(BlueprintReadWrite, Category = "UI")
+	class UInGameUI* InGameUI;
+
+protected:
+
+	virtual void BeginPlay() override;
 };
 
 
