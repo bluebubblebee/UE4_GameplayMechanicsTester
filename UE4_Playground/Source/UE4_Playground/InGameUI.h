@@ -6,6 +6,10 @@
 #include "Blueprint/UserWidget.h"
 #include "InGameUI.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndOfStartPressDelegate);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndRestartPressDelegate);
 /**
  * 
  */
@@ -28,6 +32,21 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	class USizeBox* InGameBox;
 
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* StartGameButton;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* RestartGameButton;
+
+protected:
+
+	UFUNCTION()
+	void OnStartGamePressed();
+
+	UFUNCTION()
+	void OnRestartGameButton();
+
 public:
 
 	void ShowMessages();
@@ -35,5 +54,11 @@ public:
 	void HideMessages();
 
 	void UpdateInGameMessage(const FString& Text);
+
+public:
+
+	FEndOfStartPressDelegate OnStartPress;
+
+	FEndRestartPressDelegate OnRestartPress;
 	
 };

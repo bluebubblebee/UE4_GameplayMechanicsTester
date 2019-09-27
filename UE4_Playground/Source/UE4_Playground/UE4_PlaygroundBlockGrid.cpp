@@ -150,9 +150,7 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 	currentTile = ETILETYPE::VE_BASE;
 	currentDirection = EDIRECTION::VE_NONE;
 	bIsInputLocked = true;
-	bWaitForNextMove = false;
-
-	
+	bWaitForNextMove = false;	
 
 	GetWorld()->GetTimerManager().SetTimer(StartGameTimerHandle, this, &AUE4_PlaygroundBlockGrid::OnStartGame, 10.0f);
 }

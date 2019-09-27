@@ -5,12 +5,19 @@
 #include "Components/TextBlock.h"
 #include "Components/SizeBox.h"
 #include "Components/Image.h"
+#include "Components/Button.h"
 
 bool UInGameUI::Initialize()
 {
 	bool Success = Super::Initialize();
 
 	if (!Success) return false;
+
+	if (StartGameButton == nullptr) return false;
+	StartGameButton->OnClicked.AddDynamic(this, &UInGameUI::OnStartGamePressed);
+
+	if (RestartGameButton == nullptr) return false;
+	RestartGameButton->OnClicked.AddDynamic(this, &UInGameUI::OnRestartGameButton);
 
 	UpdateInGameMessage("");
 
@@ -48,4 +55,15 @@ void UInGameUI::UpdateInGameMessage(const FString& Text)
 	if (InGameMessages == nullptr) return;
 
 	InGameMessages->SetText(FText::FromString(Text)); 
+}
+
+void UInGameUI::OnStartGamePressed()
+{
+	
+}
+
+
+void UInGameUI::OnRestartGameButton()
+{
+
 }
