@@ -164,7 +164,11 @@ void AUE4_PlaygroundBlockGrid::OnStartGame()
 
 	if ((PC != nullptr) && (PC->GetInGameUI() != nullptr))
 	{
-		PC->GetInGameUI()->HideMessages();
+		PC->GetInGameUI()->OnContinuePress.AddDynamic(this, &AUE4_PlaygroundBlockGrid::OnPressContinueMessage);
+
+		PC->GetInGameUI()->OnStartPathPress.AddDynamic(this, &AUE4_PlaygroundBlockGrid::OnStartPath);
+
+		PC->GetInGameUI()->ShowContinueMessage();
 	}
 
 	bIsInputLocked = false;
@@ -402,7 +406,7 @@ void AUE4_PlaygroundBlockGrid::MoveToNextTile()
 ///// MAIN CHARACTER: Path ///////
 void AUE4_PlaygroundBlockGrid::StartAction()
 {
-	if (bIsInputLocked) return;
+	/*if (bIsInputLocked) return;
 
 	if (MainCharacter == nullptr) return;  	 
 	
@@ -412,7 +416,7 @@ void AUE4_PlaygroundBlockGrid::StartAction()
 
 	//MoveToNextTile();
 
-	bIsInputLocked = true;
+	bIsInputLocked = true;*/
 }
 
 void AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove()
@@ -423,6 +427,46 @@ void AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove()
 
 }
 ///// MAIN CHARACTER: Path ///////
+
+///// UI ///////
+
+void AUE4_PlaygroundBlockGrid::OnPressContinueMessage()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::OnPressContinueMessage] "));
+
+	AUE4_PlaygroundPlayerController* PC = Cast<AUE4_PlaygroundPlayerController>(GetWorld()->GetFirstPlayerController());
+
+	if ((PC != nullptr) && (PC->GetInGameUI() != nullptr))
+	{
+		PC->GetInGameUI()->DisableContinueMessageButton();
+
+		PC->GetInGameUI()->HideContinueMessage();
+
+		PC->GetInGameUI()->HideMessages();
+	}
+
+	bIsInputLocked = false;
+
+}
+
+
+void AUE4_PlaygroundBlockGrid::OnStartPath()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::OnPressContinueMessage] "));
+
+	if (bIsInputLocked) return;
+
+	if (MainCharacter == nullptr) return;
+
+	bWaitForNextMove = true;
+
+	waitDeltaTime = 0.0f;
+
+	//MoveToNextTile();
+
+	bIsInputLocked = true;
+
+}
 
 
 ///// BIT BOARD ///////

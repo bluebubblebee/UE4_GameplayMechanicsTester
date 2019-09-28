@@ -72,7 +72,14 @@ private:
 	UFUNCTION()
 	void OnStartGame();
 
+	// UI
+	UFUNCTION()
+	void OnPressContinueMessage();
 
+	UFUNCTION()
+	void OnStartPath();
+
+	// UI
 
 
 	bool bIsInputLocked;

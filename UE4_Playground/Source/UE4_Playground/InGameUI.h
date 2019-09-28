@@ -7,9 +7,11 @@
 #include "InGameUI.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndOfStartPressDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartPathButtonPressDelegate);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndRestartPressDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRestartButtonPressDelegate);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FContinueButtonPressDelegate);
 /**
  * 
  */
@@ -32,6 +34,11 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	class USizeBox* InGameBox;
 
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* ContinueMessage;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* ContinueMessageButton;
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* StartGameButton;
@@ -42,7 +49,10 @@ protected:
 protected:
 
 	UFUNCTION()
-	void OnStartGamePressed();
+	void OnContinueMessagePressButton();	
+	
+	UFUNCTION()
+	void OnStartPathButtonPressed();
 
 	UFUNCTION()
 	void OnRestartGameButton();
@@ -55,10 +65,19 @@ public:
 
 	void UpdateInGameMessage(const FString& Text);
 
+
+	void DisableContinueMessageButton();
+
+	void ShowContinueMessage();
+
+	void HideContinueMessage();
+
 public:
 
-	FEndOfStartPressDelegate OnStartPress;
+	FStartPathButtonPressDelegate OnStartPathPress;
 
-	FEndRestartPressDelegate OnRestartPress;
+	FRestartButtonPressDelegate OnRestartPress;
+
+	FContinueButtonPressDelegate OnContinuePress;
 	
 };

@@ -14,12 +14,17 @@ bool UInGameUI::Initialize()
 	if (!Success) return false;
 
 	if (StartGameButton == nullptr) return false;
-	StartGameButton->OnClicked.AddDynamic(this, &UInGameUI::OnStartGamePressed);
+	StartGameButton->OnClicked.AddDynamic(this, &UInGameUI::OnStartPathButtonPressed);
 
 	if (RestartGameButton == nullptr) return false;
 	RestartGameButton->OnClicked.AddDynamic(this, &UInGameUI::OnRestartGameButton);
 
-	UpdateInGameMessage("");
+	if (ContinueMessageButton == nullptr) return false;
+	ContinueMessageButton->OnClicked.AddDynamic(this, &UInGameUI::OnContinueMessagePressButton);
+
+	UpdateInGameMessage("Click on the tiles to change its type.\nPress the Play Button to make Taichi follow the path");
+
+	HideContinueMessage();
 
 	return true;
 }
@@ -57,13 +62,44 @@ void UInGameUI::UpdateInGameMessage(const FString& Text)
 	InGameMessages->SetText(FText::FromString(Text)); 
 }
 
-void UInGameUI::OnStartGamePressed()
+void UInGameUI::DisableContinueMessageButton()
 {
-	
+	if (ContinueMessageButton != nullptr)
+	{
+		ContinueMessageButton->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+
+void UInGameUI::ShowContinueMessage()
+{	
+	if (ContinueMessage != nullptr)
+	{
+		ContinueMessage->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void UInGameUI::HideContinueMessage()
+{
+	if (ContinueMessage != nullptr)
+	{
+		ContinueMessage->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+
+void UInGameUI::OnStartPathButtonPressed()
+{
+	OnStartPathPress.Broadcast();
 }
 
 
 void UInGameUI::OnRestartGameButton()
 {
+	OnRestartPress.Broadcast();
+}
 
+void UInGameUI::OnContinueMessagePressButton()
+{
+	OnContinuePress.Broadcast();
 }
