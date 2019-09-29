@@ -29,8 +29,7 @@ public:
 
 	virtual void Init();
 
-	//FORCEINLINE class UInGameUI* GetInGameUI() const { return InGameUI; }
-
+	FORCEINLINE class UInGameUI* GetInGameUI() const { return InGameUI; }
 	
 public:
 

@@ -7,12 +7,7 @@
 #include "InGameMenuInterface.h"
 #include "InGameUI.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRestartButtonPressDelegate);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FContinueButtonPressDelegate);
-/**
- * 
- */
 UCLASS()
 class UE4_PLAYGROUND_API UInGameUI : public UUserWidget
 {
@@ -33,24 +28,22 @@ protected:
 	class UImage* BackgroundMessage;
 
 	UPROPERTY(meta = (BindWidget))
-	class USizeBox* InGameMessageBox;
-
-
-
-
+	class USizeBox* InGameMessageBox;	
 	
-
+	// Continue Messages
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* ContinueMessage;
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ContinueMessageButton;
 
+	// Game Buttons
 	UPROPERTY(meta = (BindWidget))
-	class UButton* StartGameButton;
+	class UButton* StartGamePathButton;
 
+	// Game Stats
 	UPROPERTY(meta = (BindWidget))
-	class UButton* RestartGameButton;
+	class UTextBlock* ClickCountText;
 
 protected:
 
@@ -63,43 +56,17 @@ protected:
 
 	UFUNCTION()
 	void OnContinueMessagePressButton();	
-	
-
-	UFUNCTION()
-	void OnRestartGameButton();
 
 public:
 
 	void SetMenuInteraface(IInGameMenuInterface* Menu);
 
 	// InGameMessage
-	void ShowInGameMessage(const FString& Text);
+	void ShowInGameMessage(const FString& Text, bool ShowContinue = true);
 
 	void HideInGameMessage();
 
-
-
-
-
-
-	
-
-	/*
-
-	void DisableContinueMessageButton();
-
-	void ShowContinueMessage();
-
-	void HideContinueMessage();
-	*/
-
-public:
-
-
-	FRestartButtonPressDelegate OnRestartPress;
-
-	FContinueButtonPressDelegate OnContinuePress;
-
+	void UpdateClickCountText(const FString& Text);
 
 private:
 
@@ -118,13 +85,12 @@ private:
 
 	float TotalTimeTypeWritting = 0.0f;
 
-
 	// Continue Message
+	bool bShowContinue = false;
+
 	bool bWaitToShowMesageContinue = false;
 
 	float CurrentTimeToShowContinue = 0.0f;
 
-	float DelayToShowContinue = 3.0f;
-
-	
+	float DelayToShowContinue = 1.0f;	
 };

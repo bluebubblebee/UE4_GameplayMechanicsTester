@@ -24,17 +24,12 @@ void UPlayGroundGameInstance::Init()
 {
 	if (GetWorld() == nullptr) return;
 
-	UE_LOG(LogTemp, Warning, TEXT("[UPlayGroundGameInstance::Init] Looking for grids: "));
-
 	for (TActorIterator<AUE4_PlaygroundBlockGrid> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
-
 		AUE4_PlaygroundBlockGrid *Grid = *ActorItr;
-
 		if (Grid != nullptr)
 		{
 			CurrentGrid = Grid;
-			UE_LOG(LogTemp, Warning, TEXT("[UPlayGroundGameInstance::Init] Found Grid: %s"), *Grid->GetName());
 			return;
 		}
 	}
@@ -54,7 +49,7 @@ void UPlayGroundGameInstance::OnLoadInGameMenu()
 	InGameUI->AddToViewport();
 	InGameUI->SetMenuInteraface(this);
 
-	InGameUI->ShowInGameMessage("Change the type of tile clicking on them.\nPress Start Path Button to make taichi follow the path.");
+	InGameUI->ShowInGameMessage("Click on a Tile to select a different one.\nPress the Start Path Button to make Taichi follow the path.");
 }
 
 
@@ -62,15 +57,20 @@ void UPlayGroundGameInstance::OnStartGamePath()
 {
 	UE_LOG(LogTemp, Warning, TEXT("[UPlayGroundGameInstance::OnStartGamePath] "));
 
-	// TODO: GRID START GAME PATH
-
+	if (CurrentGrid != nullptr)
+	{
+		CurrentGrid->OnStartPath();
+	}
 }
-
 
 void UPlayGroundGameInstance::OnStartGame()
 {
+	UE_LOG(LogTemp, Warning, TEXT("[UPlayGroundGameInstance::OnStartGame] "));
 
-
+	if (CurrentGrid != nullptr)
+	{
+		CurrentGrid->StartGame();
+	}
 }
 
 // Interface IInGameMenuInterface

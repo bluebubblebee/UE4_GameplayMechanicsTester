@@ -7,6 +7,7 @@
 #include "Character/MainCharacter.h"
 #include "UE4_PlaygroundPlayerController.h"
 #include "InGameUI.h"
+#include "PlayGroundGameInstance.h"
 
 
 #define LOCTEXT_NAMESPACE "PuzzleBlockGrid"
@@ -127,8 +128,6 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 
 					MainCharacter = GetWorld()->SpawnActor<AMainCharacter>(MainCharacterClass, MainPlayerPosition, FRotator(0, 0, 0));
 
-					MainCharacter->OnEndMovement.AddDynamic(this, &AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove);
-
 				}
 
 				if (NewTile != nullptr)
@@ -151,35 +150,50 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 	currentDirection = EDIRECTION::VE_NONE;
 	bIsInputLocked = true;
 	bWaitForNextMove = false;	
-
-	GetWorld()->GetTimerManager().SetTimer(StartGameTimerHandle, this, &AUE4_PlaygroundBlockGrid::OnStartGame, 10.0f);
 }
 
-void AUE4_PlaygroundBlockGrid::OnStartGame()
+
+void AUE4_PlaygroundBlockGrid::ShowInGameMessageText(const FString& Text)
 {
-	GetWorld()->GetTimerManager().ClearTimer(StartGameTimerHandle);
+	if ((GetWorld() == nullptr) || (GetWorld()->GetGameInstance() == nullptr)) return;
 
-	// Hide UI
-	AUE4_PlaygroundPlayerController* PC = Cast<AUE4_PlaygroundPlayerController>(GetWorld()->GetFirstPlayerController());
+	UPlayGroundGameInstance* GameInstance = Cast<UPlayGroundGameInstance>(GetWorld()->GetGameInstance());
 
-	/*if ((PC != nullptr) && (PC->GetInGameUI() != nullptr))
+	if ((GameInstance != nullptr) && (GameInstance->GetInGameUI() != nullptr))
 	{
-		PC->GetInGameUI()->OnContinuePress.AddDynamic(this, &AUE4_PlaygroundBlockGrid::OnPressContinueMessage);
+		GameInstance->GetInGameUI()->ShowInGameMessage(Text, false);
+	}
+}
 
-		PC->GetInGameUI()->OnStartPathPress.AddDynamic(this, &AUE4_PlaygroundBlockGrid::OnStartPath);
+void AUE4_PlaygroundBlockGrid::UpdateClicksText()
+{
+	if ((GetWorld() == nullptr) || (GetWorld()->GetGameInstance() == nullptr)) return;
 
-		PC->GetInGameUI()->ShowContinueMessage();
-	}*/
+	UPlayGroundGameInstance* GameInstance = Cast<UPlayGroundGameInstance>(GetWorld()->GetGameInstance());
 
-	bIsInputLocked = false;
+	if ((GameInstance != nullptr) && (GameInstance->GetInGameUI() != nullptr))
+	{
+		FString ClicksString = FString::FromInt(NumberTileClicked + 1);
+
+		FString MaxClicksString = FString::FromInt(MaximunTileClicks);
+
+		FString Text = "Tiles Clicked: " + ClicksString + "/" + MaxClicksString;
+
+		GameInstance->GetInGameUI()->UpdateClickCountText(Text);
+	}
+}
+
+void AUE4_PlaygroundBlockGrid::StartGame()
+{
+	bIsInputLocked = false;	
+
+	UpdateClicksText();
 }
 
 
 void AUE4_PlaygroundBlockGrid::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	//UE_LOG(LogTemp, Warning, TEXT(" AUE4_PlaygroundBlockGrid::Tick:  %f "), waitDeltaTime);
 
 	if (bWaitForNextMove)
 	{
@@ -200,13 +214,7 @@ void AUE4_PlaygroundBlockGrid::HandleClickedOnTile(class AUE4_PlaygroundBlock* T
 {
 	if (bIsInputLocked) return;
 
-	/*AUE4_PlaygroundPlayerController* PC = Cast<AUE4_PlaygroundPlayerController>(GetWorld()->GetFirstPlayerController());
-
-	if ((PC != nullptr) && (PC->GetInGameUI() != nullptr))
-	{
-		PC->GetInGameUI()->UpdateInGameMessage("HandleClickedOnTile.Testing UI");
-	}*/
-
+	UpdateClicksText();
 
 	// If max block clicked return
 	if (NumberTileClicked >= MaximunTileClicks) return;
@@ -271,7 +279,6 @@ void AUE4_PlaygroundBlockGrid::HandleClickedOnTile(class AUE4_PlaygroundBlock* T
 
 	}
 }
-
 
 
 
@@ -359,7 +366,6 @@ void AUE4_PlaygroundBlockGrid::MoveToNextTile()
 	if (OutOfBoundaries)
 	{
 		CanContinue = false;
-		//UE_LOG(LogTemp, Warning, TEXT("OutOfBoundaries CANT'T MOVE ANY LONGER:"));
 	}
 
 	// Check next tile
@@ -367,21 +373,16 @@ void AUE4_PlaygroundBlockGrid::MoveToNextTile()
 	if ((tempTile == ETILETYPE::VE_BASE) || (tempTile == ETILETYPE::VE_BLOCKED) || (tempTile == ETILETYPE::VE_BASE))
 	{
 		CanContinue = false;
-		//UE_LOG(LogTemp, Warning, TEXT(" CANT'T MOVE ANY LONGER:  %s "), *GetEnumValueAsString<ETILETYPE>("ETILETYPE", tempTile));
-	}
-	   	
+	}	   	
 
 	else
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("  "));
-
-		//UE_LOG(LogTemp, Warning, TEXT(" Keep going (tempTile):  %s "), *GetEnumValueAsString<ETILETYPE>("ETILETYPE", tempTile));
-
 		if (currentTile == ETILETYPE::VE_END)
 		{
 			CanContinue = false;
 
-			UE_LOG(LogTemp, Warning, TEXT(" REACHED END!! "));
+			ShowInGameMessageText("Well done! You've reached the end");
+			//UE_LOG(LogTemp, Warning, TEXT(" REACHED END!! "));
 		}
 		else
 		{
@@ -391,69 +392,23 @@ void AUE4_PlaygroundBlockGrid::MoveToNextTile()
 
 	if (CanContinue)
 	{
-		
 
 		bWaitForNextMove = true;
 		waitDeltaTime = 0.0f;
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT(" NO PATH FOR ME "));
+		ShowInGameMessageText("I can't walk any longer");
+		//UE_LOG(LogTemp, Warning, TEXT(" NO PATH FOR ME "));
 	}
-
-
-}
-///// MAIN CHARACTER: Path ///////
-void AUE4_PlaygroundBlockGrid::StartAction()
-{
-	/*if (bIsInputLocked) return;
-
-	if (MainCharacter == nullptr) return;  	 
-	
-	bWaitForNextMove = true;
-
-	waitDeltaTime = 0.0f;
-
-	//MoveToNextTile();
-
-	bIsInputLocked = true;*/
 }
 
-void AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove()
-{
-	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::OnCharacterEndOfMove] - (%d, %d): CurrentTile: %s - lastDirection: %s"), CurrentRowMainChar, CurrentColMainChar, *GetEnumValueAsString<ETILETYPE>("ETILETYPE", currentTile), *GetEnumValueAsString<EDIRECTION>("EDIRECTION", currentDirection));
-
-	
-
-}
 ///// MAIN CHARACTER: Path ///////
 
 ///// UI ///////
 
-void AUE4_PlaygroundBlockGrid::OnPressContinueMessage()
-{
-	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::OnPressContinueMessage] "));
-
-	/*AUE4_PlaygroundPlayerController* PC = Cast<AUE4_PlaygroundPlayerController>(GetWorld()->GetFirstPlayerController());
-
-	if ((PC != nullptr) && (PC->GetInGameUI() != nullptr))
-	{
-		PC->GetInGameUI()->DisableContinueMessageButton();
-
-		PC->GetInGameUI()->HideContinueMessage();
-
-		PC->GetInGameUI()->HideMessages();
-	}*/
-
-	bIsInputLocked = false;
-
-}
-
-
 void AUE4_PlaygroundBlockGrid::OnStartPath()
 {
-	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::OnPressContinueMessage] "));
-
 	if (bIsInputLocked) return;
 
 	if (MainCharacter == nullptr) return;
@@ -461,8 +416,6 @@ void AUE4_PlaygroundBlockGrid::OnStartPath()
 	bWaitForNextMove = true;
 
 	waitDeltaTime = 0.0f;
-
-	//MoveToNextTile();
 
 	bIsInputLocked = true;
 

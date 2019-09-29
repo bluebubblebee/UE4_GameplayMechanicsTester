@@ -13,14 +13,11 @@ bool UInGameUI::Initialize()
 
 	if (!Success) return false;
 
-	if (StartGameButton == nullptr) return false;
-	StartGameButton->OnClicked.AddDynamic(this, &UInGameUI::OnStartPathButtonPressed);
-
-	if (RestartGameButton == nullptr) return false;
-	RestartGameButton->OnClicked.AddDynamic(this, &UInGameUI::OnRestartGameButton);
-
 	if (ContinueMessageButton == nullptr) return false;
 	ContinueMessageButton->OnClicked.AddDynamic(this, &UInGameUI::OnContinueMessagePressButton);
+
+	if (StartGamePathButton == nullptr) return false;
+	StartGamePathButton->OnClicked.AddDynamic(this, &UInGameUI::OnStartPathButtonPressed);
 
 
 	if (ContinueMessageButton != nullptr)
@@ -40,7 +37,6 @@ void UInGameUI::SetMenuInteraface(IInGameMenuInterface* Menu)
 {
 	MenuInterface = Menu;
 }
-
 
 void UInGameUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
@@ -66,10 +62,8 @@ void UInGameUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 				CurrentTimeBetweenLetters = 0.0f;
 				bTypewriterMessage = false;
 
-				bWaitToShowMesageContinue = true;
-				CurrentTimeToShowContinue = 0.0f;
-
-				
+				bWaitToShowMesageContinue = bShowContinue;
+				CurrentTimeToShowContinue = 0.0f;				
 			}
 		}
 	}
@@ -96,8 +90,10 @@ void UInGameUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	}
 }
 
-void UInGameUI::ShowInGameMessage(const FString& Text)
+void UInGameUI::ShowInGameMessage(const FString& Text, bool ShowContinue)
 {
+	bShowContinue = ShowContinue;
+
 	bWaitToShowMesageContinue = false;
 	bTypewriterMessage = false;
 
@@ -143,57 +139,6 @@ void UInGameUI::HideInGameMessage()
 	}
 }
 
-
-
-
-
-
-
-
-
-
-
-/*
-void UInGameUI::DisableContinueMessageButton()
-{
-	if (ContinueMessageButton != nullptr)
-	{
-		ContinueMessageButton->SetVisibility(ESlateVisibility::Hidden);
-	}
-}
-
-
-void UInGameUI::ShowContinueMessage()
-{	
-	if (ContinueMessage != nullptr)
-	{
-		ContinueMessage->SetVisibility(ESlateVisibility::Visible);
-	}
-}
-
-void UInGameUI::HideContinueMessage()
-{
-	if (ContinueMessage != nullptr)
-	{
-		ContinueMessage->SetVisibility(ESlateVisibility::Hidden);
-	}
-}
-*/
-
-
-void UInGameUI::OnStartPathButtonPressed()
-{
-	if (MenuInterface == nullptr) return;
-
-	MenuInterface->OnStartGamePath();
-}
-
-
-void UInGameUI::OnRestartGameButton()
-{
-	//OnRestartPress.Broadcast();
-}
-
 void UInGameUI::OnContinueMessagePressButton()
 {
 	UE_LOG(LogTemp, Warning, TEXT("[UInGameUI::OnContinueMessagePressButton] "));
@@ -224,6 +169,19 @@ void UInGameUI::OnContinueMessagePressButton()
 	{
 		MenuInterface->OnStartGame();
 	}
+}
 
-	//OnContinuePress.Broadcast();
+void UInGameUI::OnStartPathButtonPressed()
+{
+	if (MenuInterface == nullptr) return;
+
+	MenuInterface->OnStartGamePath();
+}
+
+void UInGameUI::UpdateClickCountText(const FString& Text)
+{
+	if (ClickCountText != nullptr)
+	{
+		ClickCountText->SetText(FText::FromString(Text));
+	}
 }

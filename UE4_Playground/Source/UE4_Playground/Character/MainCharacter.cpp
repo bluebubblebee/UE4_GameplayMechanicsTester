@@ -18,63 +18,16 @@ void AMainCharacter::BeginPlay()
 	
 }
 
+void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
 // Called every frame
 void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (bIsMoving)
-	{
-		
-
-		//UE_LOG(LogTemp, Warning, TEXT(" Walk:  %f / %f "), CurrentDistance, TotalDistance);
-
-		if (CurrentDistance < TotalDistance)
-		{
-			FVector NewLocation = GetActorLocation();
-
-			NewLocation += Direction * Speed * DeltaTime;
-
-			SetActorLocation(NewLocation);			
-			
-			//bIsMoving = false;
-
-		}
-		else
-		{
-			//bIsReachTargetLocation = true;
-
-			
-			// Sent event
-			CurrentDistance = 0.0f;
-			bIsMoving = false;
-			SetActorLocation(TargetLocation);
-
-			OnEndMovement.Broadcast();
-
-			
-
-			
-
-			//FRotator newRotation = GetActorRotation() + FRotator(0.0f, 90.0f, 0.0f);
-			//SetActorRotation(newRotation);
-		}
-
-		CurrentDistance = FVector::Distance(GetActorLocation(), StartLocation);
-
-	}
 }
-
-
-
-// Called to bind functionality to input
-void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
-
 
 void AMainCharacter::MoveToDirection(EDIRECTION direction, float distance)
 {
@@ -97,45 +50,6 @@ void AMainCharacter::MoveToDirection(EDIRECTION direction, float distance)
 		break;
 	}
 	SetActorLocation(NewLocation);
-
-
-	/*
-
-	if (bIsMoving) return;
-		 
-	CurrentDistance = 0.0f;
-
-	StartLocation = GetActorLocation();
-
-	FVector NewLocation = GetActorLocation();
-
-	switch (direction)
-	{
-		case EDIRECTION::VE_UP:
-			NewLocation.X += distance;
-		break;
-		case EDIRECTION::VE_DOWN:
-			NewLocation.X -= distance;
-			break;
-		case EDIRECTION::VE_LEFT:
-			NewLocation.Y -= distance;
-		break;
-		case EDIRECTION::VE_RIGHT:
-			NewLocation.Y += distance;
-		break;
-	}
-
-	TargetLocation = NewLocation;
-
-	TotalDistance = FVector::Distance(StartLocation, TargetLocation);	
-
-	Direction = TargetLocation - StartLocation;
-	Direction.Normalize();
-
-	UE_LOG(LogTemp, Warning, TEXT("About to move: %f / %f"), CurrentDistance, TotalDistance);
-
-	bIsMoving = true;
-	*/
 }
 
 void AMainCharacter::RotateToDirection(EDIRECTION direction)

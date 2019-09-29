@@ -48,6 +48,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Grid Settings")
 	int32 EndRow;
+
 	UPROPERTY(BlueprintReadOnly, Category = "Grid Settings")
 	int32 EndCol;
 
@@ -59,27 +60,15 @@ protected:
 
 public:
 
-	void StartAction();
+	void StartGame();
+
+	void OnStartPath();
 
 	void HandleClickedOnTile(class AUE4_PlaygroundBlock* Tile);
 
 	FORCEINLINE class USceneComponent* GetDummyRoot() const { return DummyRoot; }
 
-
 private:
-
-	FTimerHandle StartGameTimerHandle;
-	UFUNCTION()
-	void OnStartGame();
-
-	// UI
-	UFUNCTION()
-	void OnPressContinueMessage();
-
-	UFUNCTION()
-	void OnStartPath();
-
-	// UI
 
 
 	bool bIsInputLocked;
@@ -96,9 +85,6 @@ private:
 
 	int32 CurrentColMainChar;	
 
-	UFUNCTION()
-	void OnCharacterEndOfMove();
-
 	void MoveToNextTile();
 
 	bool bWaitForNextMove;
@@ -112,6 +98,12 @@ private:
 
 	EDIRECTION currentDirection;
 	///// MAIN CHARACTER: Path ///////
+
+private:
+
+	void UpdateClicksText();
+
+	void ShowInGameMessageText(const FString& Text);
 
 private:
 
@@ -132,7 +124,6 @@ private:
 	ETILETYPE GetNextTileType(ETILETYPE currentType);
 
 	///// BIT BOARD ///////
-
 };
 
 
