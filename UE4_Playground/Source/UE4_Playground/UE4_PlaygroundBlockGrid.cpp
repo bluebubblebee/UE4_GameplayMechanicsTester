@@ -108,7 +108,8 @@ void AUE4_PlaygroundBlockGrid::BeginPlay()
 				int32 index = (row * Width + col);;
 				FString cellName = "Cell " + FString::FromInt(index) + " (" + FString::FromInt(row) + "," + FString::FromInt(col) + ")";
 
-				NewTile->SetActorLabel(cellName);
+				//NewTile->SetActorLabel(cellName);
+				
 				NewTile->SetRow(row);
 				NewTile->SetCol(col);
 
@@ -172,10 +173,17 @@ void AUE4_PlaygroundBlockGrid::UpdateClicksText()
 	UPlayGroundGameInstance* GameInstance = Cast<UPlayGroundGameInstance>(GetWorld()->GetGameInstance());
 
 	if ((GameInstance != nullptr) && (GameInstance->GetInGameUI() != nullptr))
-	{
+	{	
+
 		FString ClicksString = FString::FromInt(NumberTileClicked + 1);
 
+		if ((NumberTileClicked + 1) >= MaximunTileClicks)
+		{
+			ClicksString = FString::FromInt(MaximunTileClicks);
+		}
+
 		FString MaxClicksString = FString::FromInt(MaximunTileClicks);
+		
 
 		FString Text = "Tiles Clicked: " + ClicksString + "/" + MaxClicksString;
 
