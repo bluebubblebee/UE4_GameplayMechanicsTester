@@ -162,14 +162,14 @@ void AUE4_PlaygroundBlockGrid::OnStartGame()
 	// Hide UI
 	AUE4_PlaygroundPlayerController* PC = Cast<AUE4_PlaygroundPlayerController>(GetWorld()->GetFirstPlayerController());
 
-	if ((PC != nullptr) && (PC->GetInGameUI() != nullptr))
+	/*if ((PC != nullptr) && (PC->GetInGameUI() != nullptr))
 	{
 		PC->GetInGameUI()->OnContinuePress.AddDynamic(this, &AUE4_PlaygroundBlockGrid::OnPressContinueMessage);
 
 		PC->GetInGameUI()->OnStartPathPress.AddDynamic(this, &AUE4_PlaygroundBlockGrid::OnStartPath);
 
 		PC->GetInGameUI()->ShowContinueMessage();
-	}
+	}*/
 
 	bIsInputLocked = false;
 }
@@ -200,12 +200,12 @@ void AUE4_PlaygroundBlockGrid::HandleClickedOnTile(class AUE4_PlaygroundBlock* T
 {
 	if (bIsInputLocked) return;
 
-	AUE4_PlaygroundPlayerController* PC = Cast<AUE4_PlaygroundPlayerController>(GetWorld()->GetFirstPlayerController());
+	/*AUE4_PlaygroundPlayerController* PC = Cast<AUE4_PlaygroundPlayerController>(GetWorld()->GetFirstPlayerController());
 
 	if ((PC != nullptr) && (PC->GetInGameUI() != nullptr))
 	{
 		PC->GetInGameUI()->UpdateInGameMessage("HandleClickedOnTile.Testing UI");
-	}
+	}*/
 
 
 	// If max block clicked return
@@ -434,7 +434,7 @@ void AUE4_PlaygroundBlockGrid::OnPressContinueMessage()
 {
 	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundBlockGrid::OnPressContinueMessage] "));
 
-	AUE4_PlaygroundPlayerController* PC = Cast<AUE4_PlaygroundPlayerController>(GetWorld()->GetFirstPlayerController());
+	/*AUE4_PlaygroundPlayerController* PC = Cast<AUE4_PlaygroundPlayerController>(GetWorld()->GetFirstPlayerController());
 
 	if ((PC != nullptr) && (PC->GetInGameUI() != nullptr))
 	{
@@ -443,7 +443,7 @@ void AUE4_PlaygroundBlockGrid::OnPressContinueMessage()
 		PC->GetInGameUI()->HideContinueMessage();
 
 		PC->GetInGameUI()->HideMessages();
-	}
+	}*/
 
 	bIsInputLocked = false;
 

@@ -4,10 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "InGameMenuInterface.h"
 #include "InGameUI.generated.h"
-
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartPathButtonPressDelegate);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRestartButtonPressDelegate);
 
@@ -23,16 +21,24 @@ class UE4_PLAYGROUND_API UInGameUI : public UUserWidget
 private:
 	virtual bool Initialize() override;
 
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
 protected:
 
+	// InGameMessage
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* InGameMessages;
+	class UTextBlock* InGameMessage;
 
 	UPROPERTY(meta = (BindWidget))
-	class UImage* BackgroundMessages;
+	class UImage* BackgroundMessage;
 
 	UPROPERTY(meta = (BindWidget))
-	class USizeBox* InGameBox;
+	class USizeBox* InGameMessageBox;
+
+
+
+
+	
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* ContinueMessage;
@@ -48,36 +54,77 @@ protected:
 
 protected:
 
+	IInGameMenuInterface* MenuInterface;
+
+protected:
+
+	UFUNCTION()
+	void OnStartPathButtonPressed();
+
 	UFUNCTION()
 	void OnContinueMessagePressButton();	
 	
-	UFUNCTION()
-	void OnStartPathButtonPressed();
 
 	UFUNCTION()
 	void OnRestartGameButton();
 
 public:
 
-	void ShowMessages();
+	void SetMenuInteraface(IInGameMenuInterface* Menu);
 
-	void HideMessages();
+	// InGameMessage
+	void ShowInGameMessage(const FString& Text);
 
-	void UpdateInGameMessage(const FString& Text);
+	void HideInGameMessage();
 
+
+
+
+
+
+	
+
+	/*
 
 	void DisableContinueMessageButton();
 
 	void ShowContinueMessage();
 
 	void HideContinueMessage();
+	*/
 
 public:
 
-	FStartPathButtonPressDelegate OnStartPathPress;
 
 	FRestartButtonPressDelegate OnRestartPress;
 
 	FContinueButtonPressDelegate OnContinuePress;
+
+
+private:
+
+	// Typewritter methods
+	bool bTypewriterMessage = false;
+
+	FString MessageToTypewrite;
+
+	FString CurrentMessage;
+
+	int32 LetterIndex;
+
+	float CurrentTimeBetweenLetters = 0.0f;
+
+	float DelayBetweenLetters = 0.05f;
+
+	float TotalTimeTypeWritting = 0.0f;
+
+
+	// Continue Message
+	bool bWaitToShowMesageContinue = false;
+
+	float CurrentTimeToShowContinue = 0.0f;
+
+	float DelayToShowContinue = 3.0f;
+
 	
 };

@@ -20,23 +20,8 @@ AUE4_PlaygroundPawn::AUE4_PlaygroundPawn(const FObjectInitializer& ObjectInitial
 
 void AUE4_PlaygroundPawn::BeginPlay()
 {
-	if (GetWorld() == nullptr) return;
 
-	UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundPawn::BeginPlay] Looking for grids: "));
-
-	for (TActorIterator<AUE4_PlaygroundBlockGrid> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-	{
-
-		AUE4_PlaygroundBlockGrid *Grid = *ActorItr;
-
-		if (Grid != nullptr)
-		{
-			CurrentGrid = Grid;
-			UE_LOG(LogTemp, Warning, TEXT("[AUE4_PlaygroundPawn::BeginPlay] Found Grid: %s"), *Grid->GetName());
-			return;
-		}
-	}
-
+	Super::BeginPlay();
 }
 
 void AUE4_PlaygroundPawn::Tick(float DeltaSeconds)
@@ -47,17 +32,6 @@ void AUE4_PlaygroundPawn::Tick(float DeltaSeconds)
 void AUE4_PlaygroundPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	PlayerInputComponent->BindAction("Action", EInputEvent::IE_Pressed, this, &AUE4_PlaygroundPawn::StartAction);	
 }
 
-void AUE4_PlaygroundPawn::StartAction()
-{
-	UE_LOG(LogTemp, Warning, TEXT("AUE4_PlaygroundPawn::StartAction"));
-
-	if (CurrentGrid != nullptr)
-	{
-		CurrentGrid->StartAction();
-	}
-}
 

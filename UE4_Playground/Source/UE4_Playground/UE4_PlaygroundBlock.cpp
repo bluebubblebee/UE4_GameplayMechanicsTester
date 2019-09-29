@@ -15,7 +15,7 @@ AUE4_PlaygroundBlock::AUE4_PlaygroundBlock()
 		ConstructorHelpers::FObjectFinderOptional<UStaticMesh> PlaneMesh;
 		ConstructorHelpers::FObjectFinderOptional<UMaterial> BaseMaterial;
 
-		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MTurnLeft;
+		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MTurnLeft;  
 		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MTurnRight;
 		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MStraight;
 		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> MBlock;   

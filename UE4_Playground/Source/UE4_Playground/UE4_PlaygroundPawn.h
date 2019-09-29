@@ -21,9 +21,5 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	void StartAction();
 
-private: 
-	
-	class AUE4_PlaygroundBlockGrid* CurrentGrid;
 };

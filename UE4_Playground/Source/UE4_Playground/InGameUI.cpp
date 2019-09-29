@@ -22,46 +22,138 @@ bool UInGameUI::Initialize()
 	if (ContinueMessageButton == nullptr) return false;
 	ContinueMessageButton->OnClicked.AddDynamic(this, &UInGameUI::OnContinueMessagePressButton);
 
-	UpdateInGameMessage("Click on the tiles to change its type.\nPress the Play Button to make Taichi follow the path");
 
-	HideContinueMessage();
+	if (ContinueMessageButton != nullptr)
+	{
+		ContinueMessageButton->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	if (ContinueMessage != nullptr)
+	{
+		ContinueMessage->SetVisibility(ESlateVisibility::Hidden);
+	}
 
 	return true;
 }
 
-void UInGameUI::ShowMessages()
+void UInGameUI::SetMenuInteraface(IInGameMenuInterface* Menu)
 {
-	if (InGameBox != nullptr)
+	MenuInterface = Menu;
+}
+
+
+void UInGameUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::Tick(MyGeometry, InDeltaTime);
+
+	// Tyepwriter message
+	if (bTypewriterMessage)
 	{
-		InGameBox->SetVisibility(ESlateVisibility::Visible);
+		CurrentTimeBetweenLetters += InDeltaTime;
+
+		if (CurrentTimeBetweenLetters >= DelayBetweenLetters)
+		{
+			CurrentTimeBetweenLetters = 0.0f;
+
+			CurrentMessage += MessageToTypewrite[LetterIndex];
+
+			InGameMessage->SetText(FText::FromString(CurrentMessage));
+
+			LetterIndex += 1;
+
+			if (LetterIndex >= MessageToTypewrite.Len())
+			{
+				CurrentTimeBetweenLetters = 0.0f;
+				bTypewriterMessage = false;
+
+				bWaitToShowMesageContinue = true;
+				CurrentTimeToShowContinue = 0.0f;
+
+				
+			}
+		}
 	}
 
-	if (BackgroundMessages != nullptr)
+	// Continue Message
+	if (bWaitToShowMesageContinue)
 	{
-		BackgroundMessages->SetVisibility(ESlateVisibility::Visible);
+		CurrentTimeToShowContinue += InDeltaTime;
+
+		if (CurrentTimeToShowContinue >= DelayToShowContinue)
+		{
+			if (ContinueMessageButton != nullptr)
+			{
+				ContinueMessageButton->SetVisibility(ESlateVisibility::Visible);
+			}
+
+			if (ContinueMessage != nullptr)
+			{
+				ContinueMessage->SetVisibility(ESlateVisibility::Visible);
+			}
+
+			bWaitToShowMesageContinue = false;
+		}
 	}
 }
 
-void UInGameUI::HideMessages()
+void UInGameUI::ShowInGameMessage(const FString& Text)
 {
-	if(InGameBox != nullptr)
+	bWaitToShowMesageContinue = false;
+	bTypewriterMessage = false;
+
+	if (InGameMessage == nullptr) return;
+
+	InGameMessage->SetText(FText::FromString(""));
+
+	if (InGameMessageBox != nullptr)
 	{
-		InGameBox->SetVisibility(ESlateVisibility::Hidden);
+		InGameMessageBox->SetVisibility(ESlateVisibility::Visible);
 	}
 
-	if (BackgroundMessages != nullptr)
+	if (BackgroundMessage != nullptr)
 	{
-		BackgroundMessages->SetVisibility(ESlateVisibility::Hidden);
+		BackgroundMessage->SetVisibility(ESlateVisibility::Visible);
+	}
+	
+
+	LetterIndex = 0;
+
+	CurrentMessage = "";
+
+	MessageToTypewrite = Text;
+
+	TotalTimeTypeWritting = DelayBetweenLetters * MessageToTypewrite.Len();
+
+	CurrentTimeBetweenLetters = 0.0f;
+
+	bTypewriterMessage = true;
+}
+
+
+void UInGameUI::HideInGameMessage()
+{
+	if(InGameMessageBox != nullptr)
+	{
+		InGameMessageBox->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	if (BackgroundMessage != nullptr)
+	{
+		BackgroundMessage->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
-void UInGameUI::UpdateInGameMessage(const FString& Text)
-{
-	if (InGameMessages == nullptr) return;
 
-	InGameMessages->SetText(FText::FromString(Text)); 
-}
 
+
+
+
+
+
+
+
+
+/*
 void UInGameUI::DisableContinueMessageButton()
 {
 	if (ContinueMessageButton != nullptr)
@@ -86,20 +178,52 @@ void UInGameUI::HideContinueMessage()
 		ContinueMessage->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
+*/
 
 
 void UInGameUI::OnStartPathButtonPressed()
 {
-	OnStartPathPress.Broadcast();
+	if (MenuInterface == nullptr) return;
+
+	MenuInterface->OnStartGamePath();
 }
 
 
 void UInGameUI::OnRestartGameButton()
 {
-	OnRestartPress.Broadcast();
+	//OnRestartPress.Broadcast();
 }
 
 void UInGameUI::OnContinueMessagePressButton()
 {
-	OnContinuePress.Broadcast();
+	UE_LOG(LogTemp, Warning, TEXT("[UInGameUI::OnContinueMessagePressButton] "));
+
+	// Hide all
+	if (ContinueMessageButton != nullptr)
+	{
+		ContinueMessageButton->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	if (ContinueMessage != nullptr)
+	{
+		ContinueMessage->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+
+	if (InGameMessageBox != nullptr)
+	{
+		InGameMessageBox->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	if (BackgroundMessage != nullptr)
+	{
+		BackgroundMessage->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	if (MenuInterface != nullptr)
+	{
+		MenuInterface->OnStartGame();
+	}
+
+	//OnContinuePress.Broadcast();
 }
