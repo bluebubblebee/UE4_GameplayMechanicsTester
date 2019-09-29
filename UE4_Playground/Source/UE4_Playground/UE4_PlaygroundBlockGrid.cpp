@@ -382,7 +382,6 @@ void AUE4_PlaygroundBlockGrid::MoveToNextTile()
 			CanContinue = false;
 
 			ShowInGameMessageText("Well done! You've reached the end");
-			//UE_LOG(LogTemp, Warning, TEXT(" REACHED END!! "));
 		}
 		else
 		{
@@ -398,8 +397,10 @@ void AUE4_PlaygroundBlockGrid::MoveToNextTile()
 	}
 	else
 	{
-		ShowInGameMessageText("I can't walk any longer");
-		//UE_LOG(LogTemp, Warning, TEXT(" NO PATH FOR ME "));
+		if (currentTile != ETILETYPE::VE_END)
+		{
+			ShowInGameMessageText("Not good, I can't walk any longer");
+		}
 	}
 }
 

@@ -16,7 +16,7 @@ UPlayGroundGameInstance::UPlayGroundGameInstance(const FObjectInitializer & Obje
 
 	if (InGameUIBPClass.Class != nullptr)
 	{
-		InGameUIClass = InGameUIBPClass.Class;
+		InGameUIClass = InGameUIBPClass.Class; 
 	}
 }
 
