@@ -55,8 +55,6 @@ void UPlayGroundGameInstance::OnLoadInGameMenu()
 
 void UPlayGroundGameInstance::OnStartGamePath()
 {
-	UE_LOG(LogTemp, Warning, TEXT("[UPlayGroundGameInstance::OnStartGamePath] "));
-
 	if (CurrentGrid != nullptr)
 	{
 		CurrentGrid->OnStartPath();
@@ -65,7 +63,22 @@ void UPlayGroundGameInstance::OnStartGamePath()
 
 void UPlayGroundGameInstance::OnStartGame()
 {
-	UE_LOG(LogTemp, Warning, TEXT("[UPlayGroundGameInstance::OnStartGame] "));
+
+	if (CurrentGrid == nullptr)
+	{
+		if (GetWorld() != nullptr)
+		{
+			for (TActorIterator<AUE4_PlaygroundBlockGrid> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+			{
+				AUE4_PlaygroundBlockGrid *Grid = *ActorItr;
+				if (Grid != nullptr)
+				{
+					CurrentGrid = Grid;
+					break;
+				}
+			}
+		}
+	}
 
 	if (CurrentGrid != nullptr)
 	{

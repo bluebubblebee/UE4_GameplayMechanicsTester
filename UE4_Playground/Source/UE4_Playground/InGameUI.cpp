@@ -22,7 +22,7 @@ bool UInGameUI::Initialize()
 
 	if (ContinueMessageButton != nullptr)
 	{
-		ContinueMessageButton->SetVisibility(ESlateVisibility::Hidden);
+		ContinueMessageButton->SetVisibility(ESlateVisibility::Hidden); 
 	}
 
 	if (ContinueMessage != nullptr)
@@ -143,6 +143,11 @@ void UInGameUI::OnContinueMessagePressButton()
 {
 	UE_LOG(LogTemp, Warning, TEXT("[UInGameUI::OnContinueMessagePressButton] "));
 
+	if (MenuInterface != nullptr)
+	{
+		MenuInterface->OnStartGame();
+	}
+
 	// Hide all
 	if (ContinueMessageButton != nullptr)
 	{
@@ -163,12 +168,7 @@ void UInGameUI::OnContinueMessagePressButton()
 	if (BackgroundMessage != nullptr)
 	{
 		BackgroundMessage->SetVisibility(ESlateVisibility::Hidden);
-	}
-
-	if (MenuInterface != nullptr)
-	{
-		MenuInterface->OnStartGame();
-	}
+	}	
 }
 
 void UInGameUI::OnStartPathButtonPressed()
